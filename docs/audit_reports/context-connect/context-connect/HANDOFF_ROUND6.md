@@ -30,7 +30,7 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - [x] C5 `merge_timing_guard.py` + `--self-test`; CI: run self-test on every push; run live check on `pull_request: closed`
 - [x] C6 CI wiring for C2–C4 (positive + negative fixtures); `FULL_READ_PROTOCOL.md` §Step 4 documents both flags; `AGENT_HARD_RULES.md` Rule 4 gets the "local hash is not proof" sentence
 - [x] C7 `ROUND6_REVIEW.md` (answers to the human's Round-6 questions: hallucination list, % executed, session recommendations)
-- [ ] C8 PR opened from `genspark_ai_developer` → `main`; URL recorded here; **not self-merged** (R38)
+- [x] C8 PR opened → https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/pull/4 (cross-fork from `Elric412:round6-fork` @ eabe67e, since `push:false` on origin). Workflow change carried in `.governance/pending/` (token lacks `workflows` scope). **Not merged by the agent** (Rule 10).
 
 ## Manual actions still owned by the human (unchanged from Round 5)
 1. Import `.github/rulesets/main-protection.json` in GitHub → Settings → Rules (blocks direct-to-main and self-merge server-side; no agent can do this).
@@ -42,3 +42,4 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - C6 → https://www.genspark.ai/api/files/s/dMGHxIVy (HEAD 500a0e6)
 - C6b → https://www.genspark.ai/api/files/s/HZisD8h7 (HEAD f1adbf4)
 - C7 → https://www.genspark.ai/api/files/s/VGrQ6yjg (HEAD 27684af)
+- C8 → branch on fork: https://github.com/Elric412/Claude-Fable-5-code/tree/round6-fork · PR: https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/pull/4
