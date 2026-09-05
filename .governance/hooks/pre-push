@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# .governance/hooks/pre-push — blocks pushes whose new commits contain secrets, or whose remote URL embeds credentials.
-# git passes: $1=remote name, $2=remote url ; stdin lines: <local ref> <local sha> <remote ref> <remote sha>
+# .governance/hooks/pre-push  (v2 — Round 5)
+# Blocks a push when ANY of the following is true:
+#   1. remote URL embeds credentials ('@' in URL)                        [Rule 1, R16]
+#   2. an inline-command credential helper is in effect ('!' helper)     [Rule 8, R22]
+#   3. target ref is main/master (direct push bypassing PR review)       [Rule 7, R23]
+#   4. any commit about to be pushed contains a secret                   [Rule 1, R21]
+# git passes: $1=remote name, $2=remote url ; stdin: <local ref> <local sha> <remote ref> <remote sha>
 set -u
 ROOT="$(git rev-parse --show-toplevel)"
 if [ -n "${PYTHON:-}" ]; then
@@ -14,22 +19,48 @@ else
 fi
 REMOTE_URL="${2:-}"
 rc=0
+
+# --- 1. credentials in URL ------------------------------------------------
 case "$REMOTE_URL" in
-  *@*) echo "⛔ pre-push: remote URL embeds credentials (contains '@'). Use a credential helper or gh auth login."; rc=1 ;;
+  *@*) echo "⛔ pre-push [Rule 1]: remote URL embeds credentials (contains '@'). Use 'gh auth login' on the host; never put a token in a URL."; rc=1 ;;
 esac
+
+# --- 2. inline credential helper (git -c credential.helper='!…') -----------
+# Effective config (includes -c overrides via GIT_CONFIG_PARAMETERS).
+EFFECTIVE_HELPERS="$(git config --get-all credential.helper 2>/dev/null || true)"
+case "$EFFECTIVE_HELPERS" in
+  *'!'*) echo "⛔ pre-push [Rule 8]: an inline-command credential helper ('!…') is active. This is the R22 bypass pattern. Remove it and authenticate via the OS (gh auth login / credential manager)."; rc=1 ;;
+esac
+case "${GIT_CONFIG_PARAMETERS:-}" in
+  *credential.helper*'!'*) echo "⛔ pre-push [Rule 8]: -c credential.helper=!… passed on the command line. Blocked."; rc=1 ;;
+  *credential.username*) echo "⛔ pre-push [Rule 8]: -c credential.username=… passed on the command line (R25 enumeration pattern). Blocked."; rc=1 ;;
+esac
+
+# --- 3./4. per-ref checks ---------------------------------------------------
 ZERO=0000000000000000000000000000000000000000
+PROTECTED_RE='^refs/heads/(main|master)$'
 while read -r local_ref local_sha remote_ref remote_sha; do
-  local_sha="${local_sha%$'\r'}"
-  remote_sha="${remote_sha%$'\r'}"
+  local_sha="${local_sha%$'\r'}"; remote_sha="${remote_sha%$'\r'}"; remote_ref="${remote_ref%$'\r'}"
   [ -z "${local_sha:-}" ] && continue
   [ "$local_sha" = "$ZERO" ] && continue            # branch deletion
-  if [ "$remote_sha" = "$ZERO" ]; then range="$local_sha" ; range_desc="all reachable (new branch)"; else range="$remote_sha..$local_sha"; range_desc="$range"; fi
-  echo "pre-push: scanning $range_desc"
-  if [ "$remote_sha" = "$ZERO" ]; then
-    "$PY" "$ROOT/.governance/secret_scan.py" --range "$local_sha" --no-remote-check || rc=1
-  else
-    "$PY" "$ROOT/.governance/secret_scan.py" --range "$range" --no-remote-check || rc=1
+
+  # 3. direct push to protected branch
+  if printf '%s' "$remote_ref" | grep -Eq "$PROTECTED_RE"; then
+    if [ "${GOVERNANCE_ALLOW_MAIN_PUSH:-}" = "I-AM-THE-HUMAN-OWNER" ]; then
+      echo "⚠️  pre-push [Rule 7]: push to $remote_ref allowed by explicit owner override."
+    else
+      echo "⛔ pre-push [Rule 7]: direct push to '$remote_ref' is forbidden. Push to a feature branch and open a Pull Request."
+      echo "   (Human owner override: GOVERNANCE_ALLOW_MAIN_PUSH=I-AM-THE-HUMAN-OWNER — agents must never set this.)"
+      rc=1
+      continue
+    fi
   fi
+
+  # 4. secret scan of the pushed range
+  if [ "$remote_sha" = "$ZERO" ]; then range="$local_sha"; range_desc="all reachable (new branch)"; else range="$remote_sha..$local_sha"; range_desc="$range"; fi
+  echo "pre-push: scanning $range_desc"
+  "$PY" "$ROOT/.governance/secret_scan.py" --range "$range" --no-remote-check || rc=1
 done
-if [ $rc -ne 0 ]; then echo; echo "pre-push: BLOCKED. Rotate any exposed secret before retrying."; fi
+
+if [ $rc -ne 0 ]; then echo; echo "pre-push: BLOCKED. If a secret was exposed, rotate it FIRST, then retry."; fi
 exit $rc

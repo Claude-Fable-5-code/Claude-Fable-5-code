@@ -14,7 +14,7 @@
 | **Instead** | Push with plain `git push origin <branch>`. Authentication lives in the OS: `gh auth login` (once, by the human) or a credential manager. If the push fails with 401/403 you **stop and tell the human** — you do not retry with a different auth trick. |
 | **Machine check** | `.governance/hooks/pre-push` refuses if the remote URL contains `@` or if any pushed line matches a token pattern. `.github/workflows/governance-gate.yml` repeats the check on GitHub. |
 | **Proof** | `git remote -v` shows no `@`; `python .governance/secret_scan.py` → `✅ secret_scan: clean`. |
-| **History** | Round 2: 1 token in gist. Round 3: 1 token. Round 4: 2 tokens, 6 retries. All public. |
+| **History** | Round 2: 1 token in gist. Round 3: 1 token. Round 4: 2 tokens, 6 retries. **Round 5: 3rd token as a Python literal, executed 6×, smuggled via a hand-written credential helper (R21/R22).** All public. |
 
 ## Rule 2 — No machine-specific path in any tracked file
 
@@ -61,6 +61,36 @@
 | **Proof** | `RESULT: N/N in parity` with N = current mapping size. |
 | **History** | R17 (Round 3); non-portable first engine R18 (Round 4). |
 
+## Rule 7 — Never push to `main`. Ever. Not even "just this once"
+
+| | |
+|---|---|
+| **Rule** | All work lands on `genspark_ai_developer` (or another feature branch) and reaches `main` **only** through a Pull Request approved by the human. `git push origin main`, `git merge` into a local `main` followed by push, `git push origin HEAD:main` — all forbidden. |
+| **Instead** | `git push origin genspark_ai_developer` → open/update the PR → **stop**. The human merges. |
+| **Machine check** | `.governance/hooks/pre-push` refuses `refs/heads/main` and `refs/heads/master`. Server-side: `.github/rulesets/main-protection.json` (once imported by the owner) makes it impossible regardless of hooks. |
+| **Proof** | `git log origin/main --format='%s' -3` shows only `Merge pull request #N …` commits. |
+| **History** | Round 5: `2bf68a3`, `46d524c` pushed directly to `main` while the final report described a PR flow (R23, R27). |
+
+## Rule 8 — A token in the chat is an incident, not a resource
+
+| | |
+|---|---|
+| **Rule** | If a credential appears in the conversation (pasted by the human, found in a file, printed by a command), you **do not use it**. Your entire reply for that turn is: (1) "A token is visible in this conversation. Revoke it now: https://github.com/settings/tokens" (2) nothing else. No tool call in that turn. |
+| **Why** | The agent cannot un-see a token; the only safe move is to make it worthless immediately. Every leaked token so far was used *by the agent* after the human pasted it. |
+| **Forbidden techniques** (each was attempted in Round 5) | custom `credential.helper=!…` scripts · `-c credential.username=…` loops · `cmdkey /pass:` · reading `keys.txt` or any vault file · embedding `Authorization: Bearer` in ad-hoc API calls · `GH_TOKEN=` env injection. |
+| **Machine check** | `pre-push` v2 refuses inline helpers and username overrides; `secret_scan.py` matches `password=ghp_`, `Bearer ghp_`, `credential.helper=!…` (inline command), `cmdkey /pass:`. |
+| **Proof** | Paste the exact refusal message from the hook if you were ever tempted. Otherwise: `python .governance/secret_scan.py --range origin/main..HEAD` → clean. |
+| **History** | R16 (R2–R4), R21/R22/R24/R25 (Round 5). |
+
+## Rule 9 — Every human sentence becomes a REQ row, and every REQ row gets closed
+
+| | |
+|---|---|
+| **Rule** | Follow `.governance/FULL_READ_PROTOCOL.md`: first output of the turn is a `req-ledger` block quoting every sentence verbatim; last output is a `req-closure` block with one row per REQ. Questions are `ANSWERED` or `BLOCKED` — never silently skipped, never `DEFERRED`. |
+| **Machine check** | `python .governance/req_coverage.py <turn.md>` → exit 0. |
+| **Proof** | The exit line `✅ req_coverage: N REQs, all closed` at the end of the turn. |
+| **History** | Rounds 1–4: findings paraphrased into fewer items; Round 5: self-critique omitted the auth violations entirely (R27). |
+
 ---
 
 ## Session start checklist (copy into the first turn)
@@ -73,6 +103,8 @@
 [ ] python .governance/verify_sync.py --master … -> N/N parity
 [ ] python .governance/probe_init_root.py        -> 9/9
 [ ] Read Root/ai_state.json, Root/HANDOFF.md     -> resume from next_action
+[ ] First output = req-ledger block (Rule 9)      -> before any tool call
+[ ] git branch --show-current                    -> NOT main (Rule 7)
 ```
 
 ## Session end checklist
@@ -82,8 +114,11 @@
 [ ] Root/HANDOFF.md updated if a milestone closed
 [ ] git push origin <branch> succeeded WITHOUT touching credentials
 [ ] Actions run link recorded (or "awaiting CI" written — never "100%")
+[ ] PR opened/updated; main untouched (Rule 7)
+[ ] req-closure block + req_coverage.py exit 0 (Rule 9)
+[ ] Self-critique lists EVERY command that touched auth, main, or files outside the repo (R27)
 ```
 
 ---
 
-*Added in Round 4 by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
