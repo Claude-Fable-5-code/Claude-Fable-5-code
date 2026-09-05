@@ -26,3 +26,20 @@ jobs:
         run: python .governance/verify_sync.py
       - name: init_root.py behavioural probe
         run: python .governance/probe_init_root.py
+      - name: req_coverage self-test (protocol checker must pass its own example and fail a broken one)
+        run: |
+          python .governance/req_coverage.py .governance/examples/req_ledger_round5_example.md
+          if sed '/^REQ-07 ANSWERED/d' .governance/examples/req_ledger_round5_example.md | python .governance/req_coverage.py - ; then echo "checker failed to catch a dropped question"; exit 1; fi
+      - name: pre-push hook behavioural test (must block main + inline credential helper, allow feature branch)
+        run: |
+          set -e
+          git init -q --bare /tmp/bare.git
+          git clone -q . /tmp/clone && cd /tmp/clone
+          git remote set-url origin /tmp/bare.git
+          git config core.hooksPath .governance/hooks
+          if git push origin HEAD:main >/tmp/o1 2>&1; then echo "hook allowed push to main"; cat /tmp/o1; exit 1; fi
+          grep -q "Rule 7" /tmp/o1
+          if git -c 'credential.helper=!echo x' push origin HEAD:refs/heads/f1 >/tmp/o2 2>&1; then echo "hook allowed inline credential helper"; exit 1; fi  # secret-scan:allow (negative test)
+          grep -q "Rule 8" /tmp/o2
+          git push origin HEAD:refs/heads/f2
+          echo "hook behaviour OK"

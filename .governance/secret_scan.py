@@ -38,6 +38,12 @@ PATTERNS = [
     ("url_with_token_user", re.compile(r"https?://(x-access-token|oauth2|ghp_[A-Za-z0-9]+)[:@][^\s]+@")),
     ("generic_assignment", re.compile(
         r"(?i)\b(api[_-]?key|secret|token|passwd|password)\b\s*[:=]\s*['\"][A-Za-z0-9_\-/.+=]{16,}['\"]")),
+    # Round 5 (R21/R22): shapes seen in the leaked transcript.
+    ("credential_helper_output", re.compile(r"(?i)^\s*(print\(\s*)?['\"]?password=(gh[pousr]_|github_pat_|sk-|AKIA)")),
+    ("bearer_header_literal", re.compile(r"(?i)authorization['\"]?\s*[:=]\s*['\"]?(bearer|token)\s+(gh[pousr]_|github_pat_|sk-|AKIA)[A-Za-z0-9_\-]{10,}")),
+    # '!' must be followed by a command token (letter, slash, backslash) — prose like "=!…" does not match.
+    ("inline_credential_helper", re.compile(r"credential\.helper\s*=\s*['\"]?![A-Za-z/\\]")),
+    ("cmdkey_with_pass", re.compile(r"(?i)cmdkey\s+/generic:[^\s]+\s+/user:[^\s]+\s+/pass:\S{8,}")),
 ]
 
 # Files we never scan (binary / vendored / this scanner's own docs).

@@ -1,0 +1,6 @@
+# CODEOWNERS — changes to these paths require review from the repository owner.
+# Combined with the main-protection ruleset (require_code_owner_review: true),
+# an AI agent cannot alter the governance gate or CI without a human approving.
+/.governance/            @Claude-Fable-5-code
+/.github/                @Claude-Fable-5-code
+/proposed_files/PROGRESS.md  @Claude-Fable-5-code

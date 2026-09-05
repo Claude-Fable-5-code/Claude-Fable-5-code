@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""
+req_coverage.py — mechanical check for FULL_READ_PROTOCOL.md.
+
+Reads an agent turn (file or stdin) containing a ```req-ledger``` block and a
+```req-closure``` block, and verifies:
+  1. every REQ-nn in the ledger has exactly one closure row
+  2. no closure row refers to a REQ absent from the ledger
+  3. every [Q] REQ is ANSWERED or BLOCKED (never DONE / DEFERRED / CTX)
+  4. every [LINK] REQ is DONE or BLOCKED
+  5. closure states are from the allowed set
+  6. UNMAPPED is 'none'
+  7. COVERAGE line present; warns if REQ count < 60% of SENTENCES
+
+Exit 0 = pass. Exit 1 = violations. Exit 2 = blocks missing / malformed.
+No dependencies, no network, no paths.
+
+Usage:
+  python .governance/req_coverage.py turn.md
+  some_command | python .governance/req_coverage.py -
+"""
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
+ALLOWED = {"DONE", "ANSWERED", "RULE-KEPT", "CTX", "BLOCKED", "DEFERRED"}
+LEDGER_RX = re.compile(r"```req-ledger\s*\n(.*?)```", re.S)
+CLOSURE_RX = re.compile(r"```req-closure\s*\n(.*?)```", re.S)
+LEDGER_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[(ASK|Q|RULE|CTX|LINK)\]\s+\"(.+?)\"", re.M)
+CLOSURE_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+([A-Z-]+)\b(.*)$", re.M)
+SENT_RX = re.compile(r"^\s*SENTENCES:\s*(\d+)", re.M)
+COV_RX = re.compile(r"^\s*COVERAGE:", re.M)
+UNMAPPED_RX = re.compile(r"^\s*UNMAPPED:\s*(.+)$", re.M)
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 2:
+        print(__doc__); return 2
+    src = sys.stdin.read() if argv[1] == "-" else Path(argv[1]).read_text(encoding="utf-8", errors="replace")
+
+    lm, cm = LEDGER_RX.search(src), CLOSURE_RX.search(src)
+    if not lm:
+        print("⛔ req_coverage: no ```req-ledger``` block found (Step 1 skipped)"); return 2
+    if not cm:
+        print("⛔ req_coverage: no ```req-closure``` block found (Step 3 skipped)"); return 2
+
+    ledger = {m.group(1): (m.group(2), m.group(3)) for m in LEDGER_ROW.finditer(lm.group(1))}
+    closure_rows = CLOSURE_ROW.findall(cm.group(1))
+    closure: dict[str, list[str]] = {}
+    for rid, state, _ in closure_rows:
+        closure.setdefault(rid, []).append(state)
+
+    problems: list[str] = []
+    warnings: list[str] = []
+
+    if not ledger:
+        problems.append("ledger has zero parseable REQ rows (format: REQ-01 [ASK] \"quote\" → …)")
+
+    for rid, (kind, quote) in ledger.items():
+        states = closure.get(rid)
+        if not states:
+            problems.append(f"{rid} [{kind}] has NO closure row — dropped: \"{quote[:50]}\"")
+            continue
+        if len(states) > 1:
+            problems.append(f"{rid} has {len(states)} closure rows (must be exactly 1)")
+        st = states[0]
+        if st not in ALLOWED:
+            problems.append(f"{rid} closure state '{st}' not in {sorted(ALLOWED)}")
+        if kind == "Q" and st not in {"ANSWERED", "BLOCKED"}:
+            problems.append(f"{rid} is a QUESTION but closed as {st} — questions must be ANSWERED or BLOCKED")
+        if kind == "LINK" and st not in {"DONE", "BLOCKED"}:
+            problems.append(f"{rid} is a LINK but closed as {st} — links must be read (DONE) or BLOCKED")
+        if kind == "RULE" and st not in {"RULE-KEPT", "BLOCKED"}:
+            problems.append(f"{rid} is a RULE but closed as {st} — rules must be RULE-KEPT or BLOCKED")
+
+    for rid in closure:
+        if rid not in ledger:
+            problems.append(f"{rid} appears in closure but not in ledger (invented after the fact)")
+
+    um = UNMAPPED_RX.search(cm.group(1))
+    if not um:
+        problems.append("closure lacks 'UNMAPPED:' line")
+    elif um.group(1).strip().lower() != "none":
+        problems.append(f"UNMAPPED is not 'none': {um.group(1).strip()}")
+
+    if not COV_RX.search(lm.group(1)):
+        problems.append("ledger lacks 'COVERAGE:' line")
+    sm = SENT_RX.search(lm.group(1))
+    if sm:
+        n_sent, n_req = int(sm.group(1)), len(ledger)
+        if n_sent and n_req < 0.6 * n_sent:
+            warnings.append(f"only {n_req} REQs for {n_sent} sentences (<60%) — ledger is probably short")
+    else:
+        problems.append("ledger lacks 'SENTENCES:' line")
+
+    for w in warnings:
+        print(f"⚠️  req_coverage: {w}")
+    if problems:
+        print(f"⛔ req_coverage: {len(problems)} violation(s)")
+        for p in problems:
+            print(f"  - {p}")
+        return 1
+    print(f"✅ req_coverage: {len(ledger)} REQs, all closed" + (f" ({len(warnings)} warning)" if warnings else ""))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
