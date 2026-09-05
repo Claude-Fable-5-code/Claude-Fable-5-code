@@ -3,7 +3,15 @@
 # Installed via: bash .governance/install_hooks.sh   (sets core.hooksPath=.governance/hooks)
 set -u
 ROOT="$(git rev-parse --show-toplevel)"
-PY="${PYTHON:-python3}"; command -v "$PY" >/dev/null 2>&1 || PY=python
+if [ -n "${PYTHON:-}" ]; then
+  PY="$PYTHON"
+elif command -v python >/dev/null 2>&1 && python -c "import sys; sys.exit(0 if sys.version_info >= (3, 7) else 1)" 2>/dev/null; then
+  PY=python
+elif command -v python3 >/dev/null 2>&1 && python3 -c "import sys; sys.exit(0 if sys.version_info >= (3, 7) else 1)" 2>/dev/null; then
+  PY=python3
+else
+  PY=python
+fi
 rc=0
 "$PY" "$ROOT/.governance/secret_scan.py" --staged --no-remote-check || rc=1
 "$PY" "$ROOT/.governance/path_scan.py"   --staged                   || rc=1
