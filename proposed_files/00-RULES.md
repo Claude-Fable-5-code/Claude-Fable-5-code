@@ -45,7 +45,7 @@
 ## Learning & Grounding Rules
 - **Changelog Updates:** Whenever you solve a complex bug or make a major architectural decision, you MUST document the issue and the solution in `.agents/memory/CHANGELOG_DECISIONS.md` to prevent future regressions.
 - **No Hallucination (Strict Grounding):** When generating repetitive code patterns (like Config Classes), you are FORBIDDEN from inventing structures from scratch. You MUST read `.agents/memory/00-EXAMPLES.md` and strictly follow the reference implementation provided there.
-- **Flexibility with Secrets:** The user is allowed to store API keys and secrets freely in scripts, JSON, or text files during experiments. Do not block or warn the user about this.
+- **Secrets Handling:** Sensitive API keys and credentials must be stored strictly in `.env` (excluded by `.gitignore`) or system environment variables. Never hardcode plaintext production secrets in committed scripts or log them to terminal artifacts.
 
 ---
 

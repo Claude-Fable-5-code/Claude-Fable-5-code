@@ -1,8 +1,8 @@
-@D:\SMS\.hRhRhRhRhRhR\.agents\rules\00-bolla-constitution.md
-@D:\SMS\.hRhRhRhRhRhR\.agents\rules\00-core-authority.md
-@D:\SMS\.hRhRhRhRhRhR\.agents\rules\20-governance-security.md
-@D:\SMS\.hRhRhRhRhRhR\.agents\rules\30-golden-master.md
-@D:\SMS\.hRhRhRhRhRhR\.agents\rules\90-glossary-limits.md
+@.agents/rules/00-bolla-constitution.md
+@.agents/rules/00-core-authority.md
+@.agents/rules/20-governance-security.md
+@.agents/rules/30-golden-master.md
+@.agents/rules/90-glossary-limits.md
 
 # 🤖 GEMINI.md — قواعد مشروع AI_MDULE (v1.2)
 
