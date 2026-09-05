@@ -15,7 +15,7 @@
 | agents_v2_6 | agents_v2_5_law8 | `.agents/AGENTS.md` | 659 | `cabd5cbd6f862178802132d0e956da6bead70c950a362285cb4a080a149386e2` | 2026-09-05 | Unified Memory Core (with PROGRESS.md) | Superseded |
 | agents_v2_6_clean | agents_v2_6 | `.agents/AGENTS.md` | 236 | `92e52943543bb240777624443c22d2254c095b4133e8876c108ec88ed6ffddd1` | 2026-09-05 | Consolidate ai_state.json & Purge Duplications | Superseded |
 | agents_v2_6_seq_v2 | agents_v2_6_clean | `.agents/AGENTS.md` | 238 | `37a1eb6418046cb4a012be4c6b6af0afb9634ca826e8f05da891b67267ba347a` | 2026-09-05 | Sequential Requests Integration with Bolla v1.2 | Superseded |
-| agents_v2_6_ironclad_citation | agents_v2_6_seq_v2 | `.agents/AGENTS.md` | 283 | `21a0eec6f03f7ac9e0aca9f98b25b472670e08e7eec7b366e3344bf04946287e` | 2026-09-05 | Law 8 Ironclad Citation Fortification | **Active Sealed** |
+| agents_v2_6_ironclad_citation | agents_v2_6_seq_v2 | `.agents/AGENTS.md` | 283 | `21a0eec6f03f7ac9e0aca9f98b25b472670e08e7eec7b366e3344bf04946287e` | 2026-09-05 | Law 8 Ironclad Citation Fortification | Superseded |
 | workflow_sequential_v2 | — | `.agents/workflows/00-sequential-requests.md` | 98 | `0d2ff5142f9993dec0781c3a0ca1a1b026b28205be91662c98757a7218b19274` | 2026-09-05 | Sequential Requests v2.0 Bolla-Compliant Upgrade | **Active Sealed** |
 | anchor_b23_bridge | — | `bridge_refactor_23/01.33_telegram_gen_bridge.py` | 8585 | `2b871721eda64d9b9f2668c7d7786a6ef41f16bcac25ad6e87d060132d9d4a46` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
 | anchor_b23_engine | — | `bridge_refactor_23/01.03Genspark_claude-opus-5-code.py` | 3807 | `fc81134fe20408c9ac52bf8366984a8ef362ab189d38941a64c12889300e5835` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
@@ -31,6 +31,6 @@
 | anchor_b23_bridge_styled | anchor_b23_bridge_astra | `bridge_refactor_23/01.33_telegram_gen_bridge.py` | 8585 | `df0c2561b613b42ff2371cf25c3758d9170c19beb7b72a0accba2d55d16a2844` | 2026-09-05 | T2 Telegram Model UI Styling (17 Locs) | **Active Sealed** |
 | anchor_b23_test_p2_styled | anchor_b23_test_p2_astra | `bridge_refactor_23/tests/test_p2_model_routing.py` | 113 | `d5f132bcdb5c3742aecd51f3d204c1e0dab0cba2706d411813fa768d9a38bb00` | 2026-09-05 | T2 Telegram Model UI Styling (17 Locs) | **Active Sealed** |
 | anchor_syntx_reg_pre_t1 | — | `.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/02_syntx_register.py` | 499 | `dda124acb16c87bd26186542d1a601a0903c77323a9b8f76383c8af336e14b96` | 2026-09-05 | `.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md` | **Pre-edit** |
-
-
-
+| agents_v2_6_planning_v2 | agents_v2_6_ironclad_citation | `.agents/AGENTS.md` | 307 | `f5a535b2ed37355dc23a3669fa8b61bd85cfef420a7915e59ed8987e2fe3835a` | 2026-09-05 | Unified Planning Engine v2.0 Integration | **Active Sealed** |
+| workflow_planning_v2 | — | `.agents/workflows/00-planning.md` | 185 | `c5ed2d02ae261a6d01ac2574b80cc9fef7c60031fa5ad7bc02d9312a3125c119` | 2026-09-05 | Unified Planning Engine v2.0 Bolla-Compliant | **Active Sealed** |
+| skill_planning_system_clean | — | `.agents/skills/02-planning-system/SKILL.md` | 284 | `9c3a3170c9aca89b4b403c480ebd283afc917aaf7200f1b07e72be9c839c765c` | 2026-09-05 | Purge Legacy Debris & Unify Planning Skill | **Active Sealed** |
