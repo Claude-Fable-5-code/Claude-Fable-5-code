@@ -19,10 +19,10 @@ therefore done as **push-per-chunk**: a chunk is not "done" until `git log origi
 **Push status (verified, not assumed):** `gh api repos/.../Claude-Fable-5-code --jq .permissions` → `push:false` for the
 sandbox account `Elric412`; `git push` → 403. So *push-per-chunk is impossible from here*. Substitute that still survives
 a reset: after every chunk → `git format-patch origin/main` + `git bundle` copied to `/mnt/aidrive/round6/`. The human
-(repo owner) applies with `git am round6/*.patch && git push origin genspark_ai_developer`. No row below may say
+(repo owner) applies with `tar xzf …; git am 0*.patch && git push origin genspark_ai_developer`. No row below may say
 "pushed" until `origin/genspark_ai_developer` actually contains it (Rule 12).
 
-- [x] C1 this HANDOFF_ROUND6.md — committed locally; bundle in `/mnt/aidrive/round6/` (push: BLOCKED 403)
+- [x] C1 this HANDOFF_ROUND6.md — committed locally; bundle URL in §Exports below (push: BLOCKED 403)
 - [ ] C2 `req_coverage.py`: `--source` (R37) + `--strict-done` (R36); docstring updated
 - [ ] C3 fixtures: `examples/human_message_round5.txt` (the verbatim human message) + `examples/negative_agent_turn_round6.md` (must FAIL both new checks)
 - [ ] C4 fix `examples/req_ledger_round5_example.md` so it passes `--strict-done` honestly (DONE→BLOCKED/ANSWERED/RULE-KEPT where no second-system proof exists)
@@ -34,3 +34,5 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 ## Manual actions still owned by the human (unchanged from Round 5)
 1. Import `.governance/rulesets/main_protection.json` in GitHub → Settings → Rules (blocks direct-to-main and self-merge server-side; no agent can do this).
 2. Rotate the third leaked token (Round-5 finding R27) if not already done.
+
+## Exports (one per chunk; newest last — the latest one supersedes all earlier ones)
