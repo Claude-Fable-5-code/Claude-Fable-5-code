@@ -58,9 +58,9 @@ Allowed states: `DONE | ANSWERED | RULE-KEPT | CTX | BLOCKED | DEFERRED`. Nothin
 ## Step 4 — Mechanical check
 
 ```
-python .governance/req_coverage.py --ledger <file-or-stdin>
+python .governance/req_coverage.py <turn.md> --strict-done --source <human_message.txt>
 ```
-Exit 0 only when: every `REQ-nn` in the ledger has a closure row; every `[Q]` is `ANSWERED` or `BLOCKED` (never `DEFERRED`, never `DONE`); `UNMAPPED` is `none`; no closure row exists without a ledger row.
+Exit 0 only when: every `REQ-nn` in the ledger has a closure row; every `[Q]` is `ANSWERED` or `BLOCKED` (never `DEFERRED`, never `DONE`); `UNMAPPED` is `none`; no closure row exists without a ledger row; **(`--source`)** every ledger quote occurs verbatim in the human's message — save the message to a file first, the agent's memory of it is not the source (R37); **(`--strict-done`)** every `DONE` row carries an `https://` URL, a CI run-id or `origin/<ref>` — a local commit hash is not proof (R36).
 The agent pastes this exit code and output as the last line of the turn.
 
 ---

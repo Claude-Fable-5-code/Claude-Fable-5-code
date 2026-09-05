@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Reset-resistant fallback when the sandbox has no push permission (Rule 12: never claim "pushed").
+# Reset-resistant fallback when the sandbox has no push permission (Rule 4: never claim "pushed").
 # Produces ONE archive (bundle + patches) in /tmp; the agent then uploads it to blob storage and
 # pastes the URL in the handoff. Owner applies: tar xzf …; git am 0*.patch; git push origin <branch>
 # Usage: sh .governance/export_bundle.sh

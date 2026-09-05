@@ -103,7 +103,7 @@ def main(argv: list[str]) -> int:
         if kind == "RULE" and st not in {"RULE-KEPT", "BLOCKED"}:
             problems.append(f"{rid} is a RULE but closed as {st} — rules must be RULE-KEPT or BLOCKED")
         if strict_done and st == "DONE" and not PROOF_RX.search(proof_text.get(rid, "")):
-            problems.append(f"{rid} DONE without second-system proof (URL / run-id / origin/<ref>; a local hash does not count) — use BLOCKED if push/CI is pending (Rule 12)")
+            problems.append(f"{rid} DONE without second-system proof (URL / run-id / origin/<ref>; a local hash does not count) — use BLOCKED if push/CI is pending (Rule 4)")
         if source_text is not None and norm(quote) not in source_text:
             problems.append(f"{rid} quote is NOT verbatim in --source (paraphrase drift, R37): \"{quote[:60]}\"")
 

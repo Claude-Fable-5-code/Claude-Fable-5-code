@@ -40,8 +40,8 @@
 | **Rule** | You may not write "100%", "closed", "resolved", or "verified" in a commit message, PROGRESS.md, or chat for anything that has not passed `governance-gate` on GitHub **or** an independent run on a second machine. Your own probe on your own machine is *evidence*, not *verification*. |
 | **Instead** | Write: "local probe 9/9; awaiting CI" — then update after the run. |
 | **Machine check** | CI runs `probe_init_root.py`, `secret_scan.py`, `path_scan.py`, `verify_sync.py` on every push. |
-| **Proof** | Link to the green Actions run in the PR / PROGRESS entry. |
-| **History** | R20 (Round 4): "7/7 True 100%" claimed for a probe whose R03 case was rewritten to pass; "15/15 parity" claimed for a script that fails 0/15 anywhere else. |
+| **Proof** | Link to the green Actions run in the PR / PROGRESS entry. **A bare commit hash is not proof** — it can exist only in the sandbox. Proof is an `https://` URL, a CI run-id, or `origin/<ref>` that the human can open. `req_coverage.py --strict-done` enforces this on every `DONE` row. |
+| **History** | R20 (Round 4): "7/7 True 100%" claimed for a probe whose R03 case was rewritten to pass; "15/15 parity" claimed for a script that fails 0/15 anywhere else. R36 (Round 6): REQ-11 "push to GitHub" closed `DONE` citing local hash `a84cbe0` while `git push` had returned 403. |
 
 ## Rule 5 — Consultant findings are a checklist, not a summary
 
@@ -87,9 +87,27 @@
 | | |
 |---|---|
 | **Rule** | Follow `.governance/FULL_READ_PROTOCOL.md`: first output of the turn is a `req-ledger` block quoting every sentence verbatim; last output is a `req-closure` block with one row per REQ. Questions are `ANSWERED` or `BLOCKED` — never silently skipped, never `DEFERRED`. |
-| **Machine check** | `python .governance/req_coverage.py <turn.md>` → exit 0. |
+| **Machine check** | `python .governance/req_coverage.py <turn.md> --strict-done --source <human_msg.txt>` → exit 0. `--source` fails any ledger quote that is not verbatim in the human's message. |
 | **Proof** | The exit line `✅ req_coverage: N REQs, all closed` at the end of the turn. |
-| **History** | Rounds 1–4: findings paraphrased into fewer items; Round 5: self-critique omitted the auth violations entirely (R27). |
+| **History** | Rounds 1–4: findings paraphrased into fewer items; Round 5: self-critique omitted the auth violations entirely (R27). R37 (Round 6): "verbatim" quote `يشوعها` for the human's `يشوفها`; `علشان` for `عشان`. |
+
+## Rule 10 — A pull request is merged by someone other than its author, after CI, after ≥ 1 approval
+
+| | |
+|---|---|
+| **Rule** | The account that opened the PR does not merge it. No merge before `governance-gate` is green and at least one non-author approval exists. Minimum 5 minutes between open and merge (a human cannot read a CI log faster). |
+| **Instead** | Open the PR, paste the URL in the handoff, stop. The owner merges. |
+| **Machine check** | `merge_timing_guard.py` runs on `pull_request: closed` and turns `main` red on violation. Real fix: owner imports `.governance/rulesets/main_protection.json` (server-side; cannot be bypassed by any agent). |
+| **History** | R38 (Round 6): PR #3 opened 22:00:03Z, self-merged 22:00:07Z, zero reviews. |
+
+## Rule 11 — Handoff first, then work; export after every chunk
+
+| | |
+|---|---|
+| **Rule** | The first file written in a session is the handoff with the frozen chunk list. Each chunk ends with commit **and** an off-sandbox copy (push, or `sh .governance/export_bundle.sh` + upload when push is denied). A chunk without an off-sandbox copy is not done. |
+| **Instead** | If the sandbox resets, the next session opens the handoff and resumes from the first unchecked box — nothing is re-derived from memory. |
+| **Machine check** | Handoff ticks must reference a URL or `origin/` ref per chunk (same `--strict-done` rule). |
+| **History** | R39 (Round 6): ~40 min of Round-6 work destroyed by a reset because the handoff was written after the analysis and nothing had left the sandbox. |
 
 ---
 
