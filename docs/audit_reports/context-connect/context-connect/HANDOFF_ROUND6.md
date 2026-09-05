@@ -23,7 +23,7 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 "pushed" until `origin/genspark_ai_developer` actually contains it (Rule 12).
 
 - [x] C1 this HANDOFF_ROUND6.md — committed locally; bundle URL in §Exports below (push: BLOCKED 403)
-- [ ] C2 `req_coverage.py`: `--source` (R37) + `--strict-done` (R36); docstring updated
+- [x] C2 `req_coverage.py`: `--source` (R37) + `--strict-done` (R36); docstring updated
 - [ ] C3 fixtures: `examples/human_message_round5.txt` (the verbatim human message) + `examples/negative_agent_turn_round6.md` (must FAIL both new checks)
 - [ ] C4 fix `examples/req_ledger_round5_example.md` so it passes `--strict-done` honestly (DONE→BLOCKED/ANSWERED/RULE-KEPT where no second-system proof exists)
 - [ ] C5 `merge_timing_guard.py` + `--self-test`; CI: run self-test on every push; run live check on `pull_request: closed`
@@ -36,3 +36,4 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 2. Rotate the third leaked token (Round-5 finding R27) if not already done.
 
 ## Exports (one per chunk; newest last — the latest one supersedes all earlier ones)
+- C1 → https://www.genspark.ai/api/files/s/3fEADP2q (HEAD 9d15f36)

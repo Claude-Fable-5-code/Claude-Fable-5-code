@@ -11,12 +11,19 @@ Reads an agent turn (file or stdin) containing a ```req-ledger``` block and a
   5. closure states are from the allowed set
   6. UNMAPPED is 'none'
   7. COVERAGE line present; warns if REQ count < 60% of SENTENCES
+  8. --source FILE   : every ledger quote must occur VERBATIM (whitespace-normalised)
+                       in the human's original message. Catches paraphrase drift (R37:
+                       agent wrote يشوعها, human wrote يشوفها).
+  9. --strict-done   : every DONE row must carry second-system proof: an https:// URL,
+                       a CI run-id (8+ digits), or an 'origin/<ref>'. A bare commit hash
+                       is NOT proof (it can exist only locally — R36: a84cbe0 was cited as
+                       "pushed" while the push had failed). Use BLOCKED instead.
 
 Exit 0 = pass. Exit 1 = violations. Exit 2 = blocks missing / malformed.
 No dependencies, no network, no paths.
 
 Usage:
-  python .governance/req_coverage.py turn.md
+  python .governance/req_coverage.py turn.md [--source human_msg.txt] [--strict-done]
   some_command | python .governance/req_coverage.py -
 """
 from __future__ import annotations
@@ -36,12 +43,28 @@ CLOSURE_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+([A-Z-]+)\b(.*)$", re.M)
 SENT_RX = re.compile(r"^\s*SENTENCES:\s*(\d+)", re.M)
 COV_RX = re.compile(r"^\s*COVERAGE:", re.M)
 UNMAPPED_RX = re.compile(r"^\s*UNMAPPED:\s*(.+)$", re.M)
+PROOF_RX = re.compile(r"(https?://\S+|\b\d{8,}\b|\borigin/[\w./-]+)")  # a bare local hash is NOT proof (R36)
+WS_RX = re.compile(r"\s+")
+
+
+def norm(t: str) -> str:
+    """Whitespace-normalise; strip quotes/ellipsis the agent may add around a quote."""
+    return WS_RX.sub(" ", t.replace("…", " ").replace("\u201c", '"').replace("\u201d", '"')).strip()
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) < 2:
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    strict_done = "--strict-done" in argv
+    source_text: str | None = None
+    if "--source" in argv:
+        i = argv.index("--source")
+        if i + 1 >= len(argv):
+            print("⛔ req_coverage: --source needs a file"); return 2
+        source_text = norm(Path(argv[i + 1]).read_text(encoding="utf-8", errors="replace"))
+        args = [a for a in args if a != argv[i + 1]]
+    if not args:
         print(__doc__); return 2
-    src = sys.stdin.read() if argv[1] == "-" else Path(argv[1]).read_text(encoding="utf-8", errors="replace")
+    src = sys.stdin.read() if args[0] == "-" else Path(args[0]).read_text(encoding="utf-8", errors="replace")
 
     lm, cm = LEDGER_RX.search(src), CLOSURE_RX.search(src)
     if not lm:
@@ -52,8 +75,10 @@ def main(argv: list[str]) -> int:
     ledger = {m.group(1): (m.group(2), m.group(3)) for m in LEDGER_ROW.finditer(lm.group(1))}
     closure_rows = CLOSURE_ROW.findall(cm.group(1))
     closure: dict[str, list[str]] = {}
-    for rid, state, _ in closure_rows:
+    proof_text: dict[str, str] = {}
+    for rid, state, rest in closure_rows:
         closure.setdefault(rid, []).append(state)
+        proof_text[rid] = rest
 
     problems: list[str] = []
     warnings: list[str] = []
@@ -77,6 +102,10 @@ def main(argv: list[str]) -> int:
             problems.append(f"{rid} is a LINK but closed as {st} — links must be read (DONE) or BLOCKED")
         if kind == "RULE" and st not in {"RULE-KEPT", "BLOCKED"}:
             problems.append(f"{rid} is a RULE but closed as {st} — rules must be RULE-KEPT or BLOCKED")
+        if strict_done and st == "DONE" and not PROOF_RX.search(proof_text.get(rid, "")):
+            problems.append(f"{rid} DONE without second-system proof (URL / run-id / origin/<ref>; a local hash does not count) — use BLOCKED if push/CI is pending (Rule 12)")
+        if source_text is not None and norm(quote) not in source_text:
+            problems.append(f"{rid} quote is NOT verbatim in --source (paraphrase drift, R37): \"{quote[:60]}\"")
 
     for rid in closure:
         if rid not in ledger:
