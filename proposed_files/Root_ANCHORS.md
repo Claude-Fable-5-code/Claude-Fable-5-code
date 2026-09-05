@@ -36,3 +36,4 @@
 | skill_planning_system_clean | — | `.agents/skills/02-planning-system/SKILL.md` | 284 | `9c3a3170c9aca89b4b403c480ebd283afc917aaf7200f1b07e72be9c839c765c` | 2026-09-05 | Purge Legacy Debris & Unify Planning Skill | **Active Sealed** |
 | workflow_speckit_v2 | — | `.agents/workflows/00-speckit.md` | 114 | `eaed252d7e1681e57c0073b645e380c5c800f89beabf58c4081a4ae76462bc39` | 2026-09-05 | Spec-Kit v2.0 Bolla-Compliant Upgrade | **Active Sealed** |
 | agent_md_unified_v2 | — | `.agents/AGENT.md` | 46 | `1f0222e9af2486771c6c21cba0ad798e8ef9710fe3e147597f5e407507bb26b4` | 2026-09-05 | Unified Agent Orientation & Bolla v1.2 | **Active Sealed** |
+| readme_v2_orchestration_clean | — | `README.md` | 137 | `7dfdf087311f13f2c9bf6d3d65a2aed2a1bbc7407bd9df39736bdf00845d9a14` | 2026-09-05 | Pure Orchestration README & Historical Ledger Isolation | **Active Sealed** |
