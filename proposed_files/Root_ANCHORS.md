@@ -12,7 +12,9 @@
 | bolla_constitution_v1_2 | bolla_constitution_v1_1 | `.agents/rules/00-bolla-constitution.md` | 44 | `a2e22aa154dacaa90807b86850e8b5ef1a9d5fc07dfe813a7a52613a2021946a` | 2026-09-05 | Laws 9 & 10 + Double Check Consolidation | **Active Sealed** |
 | gemini_v1_2 | gemini_v1_1 | `GEMINI.md` | 114 | `c990de42b7d25d0f95a640c99626f2303ea53c4b097c7ab0bb1ce19a49aa7194` | 2026-09-05 | Laws 9 & 10 Consolidation | **Active Sealed** |
 | agents_v2_6 | agents_v2_5_law8 | `.agents/AGENTS.md` | 659 | `cabd5cbd6f862178802132d0e956da6bead70c950a362285cb4a080a149386e2` | 2026-09-05 | Unified Memory Core (with PROGRESS.md) | Superseded |
-| agents_v2_6_clean | agents_v2_6 | `.agents/AGENTS.md` | 236 | `92e52943543bb240777624443c22d2254c095b4133e8876c108ec88ed6ffddd1` | 2026-09-05 | Consolidate ai_state.json & Purge Duplications | **Active Sealed** |
+| agents_v2_6_clean | agents_v2_6 | `.agents/AGENTS.md` | 236 | `92e52943543bb240777624443c22d2254c095b4133e8876c108ec88ed6ffddd1` | 2026-09-05 | Consolidate ai_state.json & Purge Duplications | Superseded |
+| agents_v2_6_seq_v2 | agents_v2_6_clean | `.agents/AGENTS.md` | 238 | `37a1eb6418046cb4a012be4c6b6af0afb9634ca826e8f05da891b67267ba347a` | 2026-09-05 | Sequential Requests Integration with Bolla v1.2 | **Active Sealed** |
+| workflow_sequential_v2 | — | `.agents/workflows/00-sequential-requests.md` | 98 | `0d2ff5142f9993dec0781c3a0ca1a1b026b28205be91662c98757a7218b19274` | 2026-09-05 | Sequential Requests v2.0 Bolla-Compliant Upgrade | **Active Sealed** |
 | anchor_b23_bridge | — | `bridge_refactor_23/01.33_telegram_gen_bridge.py` | 8585 | `2b871721eda64d9b9f2668c7d7786a6ef41f16bcac25ad6e87d060132d9d4a46` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
 | anchor_b23_engine | — | `bridge_refactor_23/01.03Genspark_claude-opus-5-code.py` | 3807 | `fc81134fe20408c9ac52bf8366984a8ef362ab189d38941a64c12889300e5835` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
 | anchor_b23_test_p2 | — | `bridge_refactor_23/tests/test_p2_model_routing.py` | 86 | `f691784f11c89bc466fdfc5dcb2162207008e7496cc96b350dc928d120864a3b` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
