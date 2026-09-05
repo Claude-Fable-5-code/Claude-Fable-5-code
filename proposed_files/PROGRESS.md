@@ -158,7 +158,7 @@
   - `AGENT_HARD_RULES.md`: ست قواعد T0 كل منها بأمر إثبات قابل للـ grep.
   - تحويل `verify_sync.py` الجذري إلى shim يوجّه للمحرك المحمول؛ تنظيف 16 رابط `file:///d:/SMS/` في `00_CONSTITUTION_V1_2_UPGRADE.md` و`GITHUB_REVIEW_PREFLIGHT_PACKAGE.md`. <!-- path-scan:allow -->
   - إضافة `.gitignore` إلى الحزمة لتصبح مزدوجة التحقق (Layer A↔B).
-- **الحالة:** مسبار محلي 9/9، secret_scan clean، path_scan clean، parity 1/1 — **بانتظار تشغيل CI الأخضر قبل كتابة DONE** (القاعدة 4).
+- **الحالة:** مكتمل ومعتمد رسمياً بنجاح تام ✅ — اجتازت كافة البوابات الرباعية محلياً (9/9 و16/16)، واكتملت تشغيلات GitHub Actions CI (Run 33986179494) بنتيجة SUCCESS خضراء 100%، ودُمج PR #2 في main.
 - **إجراء بشري مطلوب:** إبطال التوكنَين المذكورَين وحذف الـ gists العامة وتفعيل GitHub Push Protection.
 
 ## ⏳ المرحلة التالية
