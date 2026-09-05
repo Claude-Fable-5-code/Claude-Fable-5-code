@@ -43,3 +43,8 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - C6b → https://www.genspark.ai/api/files/s/HZisD8h7 (HEAD f1adbf4)
 - C7 → https://www.genspark.ai/api/files/s/VGrQ6yjg (HEAD 27684af)
 - C8 → branch on fork: https://github.com/Elric412/Claude-Fable-5-code/tree/round6-fork · PR: https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/pull/4
+
+## CI state at end of Round 6 (second-system, verified via `gh run list`)
+- Upstream PR #4 runs `33997546997`, `33997560018` → `action_required`: first-time fork contributor; **owner must click "Approve and run"** on the PR's Checks tab.
+- Fork push runs `33997533594`, `33997558315` → `success` — but that is the **old** workflow (Round-5 gate). The Round-6 checks are NOT yet CI-proven anywhere; they become proven only after the owner applies `.governance/pending/governance-gate.yml`.
+- Therefore R36/R37/R38 status = **fixed locally + pushed to fork; CI-proof pending owner** (not DONE under Rule 4).
