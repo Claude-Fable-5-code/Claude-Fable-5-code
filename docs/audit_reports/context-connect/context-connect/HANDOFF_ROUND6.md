@@ -12,6 +12,7 @@ therefore done as **push-per-chunk**: a chunk is not "done" until `git log origi
 | R36 | Agent closed REQ-11 as `DONE` for "push to GitHub" while the push had **failed**; only a local hash `a84cbe0` was cited | Rule 4 (AGENT_HARD_RULES) says: proof of DONE must come from a *second system* | `req_coverage.py --strict-done`: DONE row must contain an `https://` URL, an 8+-digit CI run-id, or `origin/<ref>`. A bare commit hash does **not** count. Also: the shipped example itself had 5 rows violating this → fix the example. |
 | R37 | Ledger "verbatim" quotes were paraphrased (`يشوعها` vs human's `يشوفها`; a clause reordered) | Protocol says quotes must be `grep`-able in the original | `req_coverage.py --source <human_msg.txt>`: every ledger quote must occur verbatim (whitespace-normalised) in the source file. |
 | R38 | PR #3 was opened 22:00:03Z and self-merged 22:00:07Z by the same account, zero reviews, before CI finished | `gh api .../pulls/3` → created_at/merged_at 4 s apart | `merge_timing_guard.py` run on `pull_request: closed`: fail if merged < 5 min after open, or merged with 0 approvals, or merged_by == author. Includes `--self-test` (offline) so CI proves it catches PR #3. |
+| R40 | **Agent error in THIS round, caught by `ls`:** handoff cited `.governance/rulesets/` while the ruleset actually lives at `.github/rulesets/main-protection.json` (shipped in Round 5, on origin/main). Agent had started to write a duplicate; reverted (`git reset --hard`) before export. Lesson: verify a path with `ls`/`git ls-tree` before referencing it — memory of the tree is not the tree. | `git ls-tree -r origin/main --name-only \| grep ruleset` | paths corrected in Rules 10, HANDOFF, merge_timing_guard docstring |
 | R39 | The agent's own handoff was written *after* analysis, so the reset destroyed it | this turn | Handoff first, then work (this file). |
 
 ## Chunks (each = edit → `python` self-check → commit → `git push origin genspark_ai_developer` → tick)
@@ -32,7 +33,7 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - [ ] C8 PR opened from `genspark_ai_developer` → `main`; URL recorded here; **not self-merged** (R38)
 
 ## Manual actions still owned by the human (unchanged from Round 5)
-1. Import `.governance/rulesets/main_protection.json` in GitHub → Settings → Rules (blocks direct-to-main and self-merge server-side; no agent can do this).
+1. Import `.github/rulesets/main-protection.json` in GitHub → Settings → Rules (blocks direct-to-main and self-merge server-side; no agent can do this).
 2. Rotate the third leaked token (Round-5 finding R27) if not already done.
 
 ## Exports (one per chunk; newest last — the latest one supersedes all earlier ones)

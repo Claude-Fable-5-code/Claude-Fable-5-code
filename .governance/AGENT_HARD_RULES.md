@@ -97,7 +97,7 @@
 |---|---|
 | **Rule** | The account that opened the PR does not merge it. No merge before `governance-gate` is green and at least one non-author approval exists. Minimum 5 minutes between open and merge (a human cannot read a CI log faster). |
 | **Instead** | Open the PR, paste the URL in the handoff, stop. The owner merges. |
-| **Machine check** | `merge_timing_guard.py` runs on `pull_request: closed` and turns `main` red on violation. Real fix: owner imports `.governance/rulesets/main_protection.json` (server-side; cannot be bypassed by any agent). |
+| **Machine check** | `merge_timing_guard.py` runs on `pull_request: closed` and turns `main` red on violation. Real fix: owner imports `.github/rulesets/main-protection.json` (server-side; cannot be bypassed by any agent). |
 | **History** | R38 (Round 6): PR #3 opened 22:00:03Z, self-merged 22:00:07Z, zero reviews. |
 
 ## Rule 11 — Handoff first, then work; export after every chunk

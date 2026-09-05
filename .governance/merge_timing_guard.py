@@ -4,7 +4,7 @@ merge_timing_guard.py — post-merge audit for pull requests (finding R38).
 
 PR #3 was opened 2026-09-05T22:00:03Z and merged 22:00:07Z by its own author with zero
 reviews, before the governance-gate had finished. A client-side hook cannot stop that;
-a GitHub ruleset can (see .governance/rulesets/), but until the owner imports it this
+a GitHub ruleset can (see .github/rulesets/), but until the owner imports it this
 guard at least makes every such merge a RED run on main, visible in the Actions tab.
 
 Fails (exit 1) when ANY of:
