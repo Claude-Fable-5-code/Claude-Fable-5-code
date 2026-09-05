@@ -34,3 +34,5 @@
 | agents_v2_6_planning_v2 | agents_v2_6_ironclad_citation | `.agents/AGENTS.md` | 307 | `f5a535b2ed37355dc23a3669fa8b61bd85cfef420a7915e59ed8987e2fe3835a` | 2026-09-05 | Unified Planning Engine v2.0 Integration | **Active Sealed** |
 | workflow_planning_v2 | — | `.agents/workflows/00-planning.md` | 185 | `c5ed2d02ae261a6d01ac2574b80cc9fef7c60031fa5ad7bc02d9312a3125c119` | 2026-09-05 | Unified Planning Engine v2.0 Bolla-Compliant | **Active Sealed** |
 | skill_planning_system_clean | — | `.agents/skills/02-planning-system/SKILL.md` | 284 | `9c3a3170c9aca89b4b403c480ebd283afc917aaf7200f1b07e72be9c839c765c` | 2026-09-05 | Purge Legacy Debris & Unify Planning Skill | **Active Sealed** |
+| workflow_speckit_v2 | — | `.agents/workflows/00-speckit.md` | 114 | `eaed252d7e1681e57c0073b645e380c5c800f89beabf58c4081a4ae76462bc39` | 2026-09-05 | Spec-Kit v2.0 Bolla-Compliant Upgrade | **Active Sealed** |
+| agent_md_unified_v2 | — | `.agents/AGENT.md` | 46 | `1f0222e9af2486771c6c21cba0ad798e8ef9710fe3e147597f5e407507bb26b4` | 2026-09-05 | Unified Agent Orientation & Bolla v1.2 | **Active Sealed** |
