@@ -53,17 +53,7 @@ def create_root(project_name: str, description: str, tech_stack: str = "Python")
     root_path.mkdir(parents=True, exist_ok=True)
     now = datetime.now().isoformat(timespec="seconds")
 
-    # ── ai_state.json (مطابقة لعقد AGENTS.md بدقة: 8 مفاتيح قياسية فقط) ──────
-    contract_keys = {
-        "mode", "current_tag", "turn_count", "git_commit",
-        "last_action", "next_action", "last_message_summary", "last_updated"
-    }
-
-    extra_preserved = {k: v for k, v in existing_state.items() if k not in contract_keys}
-    summary = f"تهيئة النواة الموحدة ({tech_stack})"
-    if extra_preserved:
-        summary = f"تم الحفاظ على بيانات الحالة السابقة: {extra_preserved}"
-
+    # ── ai_state.json (مطابقة لعقد AGENTS.md: 8 مفاتيح قياسية في الإنشاء الجديد، والحفاظ الكامل على الحالة عند إعادة التهيئة) ──
     ai_state = {
         "mode": existing_state.get("mode", "[READING]"),
         "current_tag": existing_state.get("current_tag", "[READING]"),
@@ -71,9 +61,13 @@ def create_root(project_name: str, description: str, tech_stack: str = "Python")
         "git_commit": existing_state.get("git_commit", "initial"),
         "last_action": existing_state.get("last_action", f"تم إنشاء وتدشين Root/ لمشروع: {project_name}"),
         "next_action": existing_state.get("next_action", "اقرأ README.md وباشر فحص المتطلبات"),
-        "last_message_summary": summary,
+        "last_message_summary": existing_state.get("last_message_summary", f"تهيئة النواة الموحدة ({tech_stack})"),
         "last_updated": now
     }
+    if existing_state:
+        for k, v in existing_state.items():
+            ai_state[k] = v
+        ai_state["last_updated"] = now
 
     (root_path / "ai_state.json").write_text(
         json.dumps(ai_state, ensure_ascii=False, indent=2), encoding="utf-8"
