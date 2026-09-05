@@ -1,31 +1,8 @@
-AGENT.md
-CLAUDE.md
-.agent-mem/
-
-# Auto-generated agent rules (personalized per developer)
-.brainsync/agent-rules.md
-
-# Auto-generated AI agent exclusions
-.cursorrules
-.clineRules
-.agent/
-.windsurfrules
-.gemini/
-.cline/
-
-# Ignored logs, evidence captures, and bytecode caches
-**/evidence/
+# Bytecode and build caches
+__pycache__/
 **/__pycache__/
-captures_mock/
-**/*.png
-**/*.html
-**/*.json
-**/*.mp3
-**/*.txt
-!**/test_number.txt
-
-__ROLE/GEMINI_ARCHIVE.md
-__ROLE/tmp/
+*.py[cod]
+*$py.class
 
 # Sensitive data, accounts, tokens, and HAR captures
 **/*.har
@@ -39,8 +16,16 @@ accounts.md
 .env
 .env.*
 *.env
+local.env
 Root/keys.txt
 **/keys.txt
 *.pem
 *.key
+demo.key
+demo.pem
 
+# Local scratch and temporary caches
+scratch/
+**/scratch/
+tmp/
+**/tmp/

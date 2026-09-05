@@ -134,13 +134,13 @@ graph TD
 | 💀 2 | التخطيط المبني على التخمين بدون أدلة سطرية | انتهاك للقانون 8 (الإسناد المرجعي) $\rightarrow$ رفض الخطة واعتبارها باطلة. |
 | 💀 3 | تجاهل خطة التراجع (Rollback Plan) | انتهاك للقانون 1 و 9 $\rightarrow$ حظر تنفيذ المهمة حتى توفير خطة تراجع مدعومة بالمرساة. |
 | 💀 4 | التخطيط المفتوح بلا حدود (Scope Creep) | انتهاك للقانون 2 و 10 $\rightarrow$ إلزامية تحديد Non-Goals واضحة قبل البدء. |
-| 💀 5 | عدم تحديث دفاتر النواة الموحدة أثناء التخطيط | انتهاك لـ Fatal Rule #SYNC $\rightarrow$ توقف فوري وتحديث `Root/ai_state.json`. |
+| 💀 5 | عدم تحديث بوصلة الحالة اللحظية أثناء التخطيط | انتهاك لـ Fatal Rule #SYNC $\rightarrow$ توقف فوري وتحديث `Root/ai_state.json`. |
 
 ---
 
 ## 🔗 التكامل المباشر مع الأدوات والمهارات
 
-* **سجلات وقوالب التخطيط:** استخدم المهارة الرسمية [02-planning-system](file:///d:/SMS/.hRhRhRhRhRhR/.agents/skills/02-planning-system/SKILL.md) لتطبيق القوالب وسجل PLANNING TRACKER.
-* **تقسيم المهام التنفيذية:** ارجع إلى بروتوكول [/00-micro-tasking](file:///d:/SMS/.hRhRhRhRhRhR/.agents/workflows/00-micro-tasking.md) لتقطيع الخطة لمهام دقيقة (Test-Before-Talk).
-* **تطوير الـ APIs والأتمتة:** ارجع إلى مسار [/00-sequential-requests](file:///d:/SMS/.hRhRhRhRhRhR/.agents/workflows/00-sequential-requests.md) لبناء السكريبتات ريكويست بريكويست.
-* **دستور بولا والحوكمة:** المرجع الدستوري الأعلى والأشمل هو [/00-bolla-constitution](file:///d:/SMS/.hRhRhRhRhRhR/.agents/rules/00-bolla-constitution.md).
+* **سجلات وقوالب التخطيط:** استخدم المهارة الرسمية [02-planning-system](.agents/skills/02-planning-system/SKILL.md) لتطبيق القوالب وسجل PLANNING TRACKER.
+* **تقسيم المهام التنفيذية:** ارجع إلى بروتوكول [/00-micro-tasking](.agents/workflows/00-micro-tasking.md) لتقطيع الخطة لمهام دقيقة (Test-Before-Talk).
+* **تطوير الـ APIs والأتمتة:** ارجع إلى مسار [/00-sequential-requests](.agents/workflows/00-sequential-requests.md) لبناء السكريبتات ريكويست بريكويست.
+* **دستور بولا والحوكمة:** المرجع الدستوري الأعلى والأشمل هو [/00-bolla-constitution](.agents/rules/00-bolla-constitution.md).
