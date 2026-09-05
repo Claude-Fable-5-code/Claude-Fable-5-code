@@ -11,7 +11,7 @@
 | agents_v2_5_law8 | — | `.agents/AGENTS.md` | 993 | `1071537e4250376fe36aea7b0711d5182f72a874026eab28dd646998b9925503` | 2026-09-04 | Law 8 Ratification | Superseded |
 | bolla_constitution_v1_2 | bolla_constitution_v1_1 | `.agents/rules/00-bolla-constitution.md` | 44 | `a2e22aa154dacaa90807b86850e8b5ef1a9d5fc07dfe813a7a52613a2021946a` | 2026-09-05 | Laws 9 & 10 + Double Check Consolidation | **Active Sealed** |
 | gemini_v1_2 | gemini_v1_1 | `GEMINI.md` | 114 | `c990de42b7d25d0f95a640c99626f2303ea53c4b097c7ab0bb1ce19a49aa7194` | 2026-09-05 | Laws 9 & 10 Consolidation | **Active Sealed** |
-| agents_v2_6 | agents_v2_5_law8 | `.agents/AGENTS.md` | 658 | `a63be1461e24e2d98e942bc035db776e3c88318e7bf0c178e8bb4882a73444c2` | 2026-09-05 | Full Micro-Factory & Team Purge | **Active Sealed** |
+| agents_v2_6 | agents_v2_5_law8 | `.agents/AGENTS.md` | 658 | `7995b3c5cc2eb8820132cbee08ff5a5f489917207a106c4cd2b338106bb6f029` | 2026-09-05 | Unified Memory & Continuity Core | **Active Sealed** |
 | anchor_b23_bridge | — | `bridge_refactor_23/01.33_telegram_gen_bridge.py` | 8585 | `2b871721eda64d9b9f2668c7d7786a6ef41f16bcac25ad6e87d060132d9d4a46` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
 | anchor_b23_engine | — | `bridge_refactor_23/01.03Genspark_claude-opus-5-code.py` | 3807 | `fc81134fe20408c9ac52bf8366984a8ef362ab189d38941a64c12889300e5835` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
 | anchor_b23_test_p2 | — | `bridge_refactor_23/tests/test_p2_model_routing.py` | 86 | `f691784f11c89bc466fdfc5dcb2162207008e7496cc96b350dc928d120864a3b` | 2026-09-05 | T2 Fable 5.1 Upgrade | Superseded |
