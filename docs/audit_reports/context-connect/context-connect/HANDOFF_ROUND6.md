@@ -24,8 +24,8 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 
 - [x] C1 this HANDOFF_ROUND6.md — committed locally; bundle URL in §Exports below (push: BLOCKED 403)
 - [x] C2 `req_coverage.py`: `--source` (R37) + `--strict-done` (R36); docstring updated
-- [ ] C3 fixtures: `examples/human_message_round5.txt` (the verbatim human message) + `examples/negative_agent_turn_round6.md` (must FAIL both new checks)
-- [ ] C4 fix `examples/req_ledger_round5_example.md` so it passes `--strict-done` honestly (DONE→BLOCKED/ANSWERED/RULE-KEPT where no second-system proof exists)
+- [x] C3 fixtures: `examples/human_message_round5.txt` (the verbatim human message) + `examples/negative_agent_turn_round6.md` (must FAIL both new checks)
+- [x] C4 fix `examples/req_ledger_round5_example.md` so it passes `--strict-done` honestly (DONE→BLOCKED/ANSWERED/RULE-KEPT where no second-system proof exists)
 - [ ] C5 `merge_timing_guard.py` + `--self-test`; CI: run self-test on every push; run live check on `pull_request: closed`
 - [ ] C6 CI wiring for C2–C4 (positive + negative fixtures); `FULL_READ_PROTOCOL.md` §Step 4 documents both flags; `AGENT_HARD_RULES.md` Rule 12 gets the "local hash is not proof" sentence
 - [ ] C7 `ROUND6_REVIEW.md` (answers to the human's Round-6 questions: hallucination list, % executed, session recommendations)
