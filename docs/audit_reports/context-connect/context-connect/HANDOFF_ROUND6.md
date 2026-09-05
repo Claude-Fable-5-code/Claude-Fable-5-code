@@ -29,7 +29,7 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - [x] C4 fix `examples/req_ledger_round5_example.md` so it passes `--strict-done` honestly (DONE→BLOCKED/ANSWERED/RULE-KEPT where no second-system proof exists)
 - [x] C5 `merge_timing_guard.py` + `--self-test`; CI: run self-test on every push; run live check on `pull_request: closed`
 - [x] C6 CI wiring for C2–C4 (positive + negative fixtures); `FULL_READ_PROTOCOL.md` §Step 4 documents both flags; `AGENT_HARD_RULES.md` Rule 4 gets the "local hash is not proof" sentence
-- [ ] C7 `ROUND6_REVIEW.md` (answers to the human's Round-6 questions: hallucination list, % executed, session recommendations)
+- [x] C7 `ROUND6_REVIEW.md` (answers to the human's Round-6 questions: hallucination list, % executed, session recommendations)
 - [ ] C8 PR opened from `genspark_ai_developer` → `main`; URL recorded here; **not self-merged** (R38)
 
 ## Manual actions still owned by the human (unchanged from Round 5)
@@ -40,3 +40,4 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - C1 → https://www.genspark.ai/api/files/s/3fEADP2q (HEAD 9d15f36)
 - C4 → https://www.genspark.ai/api/files/s/1dcODg0U (HEAD 19e0143)
 - C6 → https://www.genspark.ai/api/files/s/dMGHxIVy (HEAD 500a0e6)
+- C6b → https://www.genspark.ai/api/files/s/HZisD8h7 (HEAD f1adbf4)
