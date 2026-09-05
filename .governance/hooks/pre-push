@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# .governance/hooks/pre-push — blocks pushes whose new commits contain secrets, or whose remote URL embeds credentials.
+# git passes: $1=remote name, $2=remote url ; stdin lines: <local ref> <local sha> <remote ref> <remote sha>
+set -u
+ROOT="$(git rev-parse --show-toplevel)"
+PY="${PYTHON:-python3}"; command -v "$PY" >/dev/null 2>&1 || PY=python
+REMOTE_URL="${2:-}"
+rc=0
+case "$REMOTE_URL" in
+  *@*) echo "⛔ pre-push: remote URL embeds credentials (contains '@'). Use a credential helper or gh auth login."; rc=1 ;;
+esac
+ZERO=0000000000000000000000000000000000000000
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${local_sha:-}" ] && continue
+  [ "$local_sha" = "$ZERO" ] && continue            # branch deletion
+  if [ "$remote_sha" = "$ZERO" ]; then range="$local_sha" ; range_desc="all reachable (new branch)"; else range="$remote_sha..$local_sha"; range_desc="$range"; fi
+  echo "pre-push: scanning $range_desc"
+  if [ "$remote_sha" = "$ZERO" ]; then
+    "$PY" "$ROOT/.governance/secret_scan.py" --range "$local_sha" --no-remote-check || rc=1
+  else
+    "$PY" "$ROOT/.governance/secret_scan.py" --range "$range" --no-remote-check || rc=1
+  fi
+done
+if [ $rc -ne 0 ]; then echo; echo "pre-push: BLOCKED. Rotate any exposed secret before retrying."; fi
+exit $rc

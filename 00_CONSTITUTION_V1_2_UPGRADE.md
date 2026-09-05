@@ -44,13 +44,13 @@
 
 | # | الملف المستهدف | مساره الدقيق | نوع التعديل والإجراء المطلوب | التصنيف الدستوري |
 |---|---|---|---|:---:|
-| **1** | **نواة دستور بولا** | [`.agents/rules/00-bolla-constitution.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/rules/00-bolla-constitution.md) | - إضافة القانون 9 (كوبري التسليم والاستئناف الحتمي).<br>- إضافة القانون 10 (العزل الهيكلي للمشاريع).<br>- تعديل سطر T1 لإلزام وثيقة المواصفات Micro-Spec مسبقاً.<br>- تحديث الـ CHANGELOG إلى v1.2. | **T1 دستوري** |
-| **2** | **الدليل الكامل للبروتوكول** | [`docs/BOLLA_PROTOCOL.md`](file:///d:/SMS/.hRhRhRhRhRhR/docs/BOLLA_PROTOCOL.md) | - تفصيل القانونين 9 و 10 وشرح حوادثهما المُولِّدة.<br>- تفصيل الفروق الدقيقة ومواعيد تحديث الثالوث (`ANCHORS.md` و `PROGRESS.md` و `HANDOFF.md`).<br>- ترقية الإصدار إلى v1.2. | **T0 توثيق** |
-| **3** | **مؤشر بروتوكول بولا** | [`__ROLE/BOLLA_PROTOCOL.md`](file:///d:/SMS/.hRhRhRhRhRhR/__ROLE/BOLLA_PROTOCOL.md) | تحديث رقم الإصدار المعتمد إلى v1.2. | **T0 توثيق** |
-| **4** | **سير عمل دستور بولا** | [`.agents/workflows/00-bolla-constitution.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/workflows/00-bolla-constitution.md) | مزامنة النصوص الدستورية الجديدة والقوانين العشرة. | **T0 توثيق** |
-| **5** | **مهارة دستور بولا** | [`.agents/skills/00-bolla-constitution/SKILL.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/skills/00-bolla-constitution/SKILL.md) | مزامنة المهارة بالنظام المحدث والقوانين العشرة. | **T0 توثيق** |
-| **6** | **وثيقة مواصفات Syntx AI** | نقلها من `__ROLE/` العام إلى مجلدها المعزول:<br>[`.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md`](file:///d:/SMS/.hRhRhRhRhRhR/.AAA_GGG_iii_VIBE_CODING/%F0%9F%9F%A2_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md) | عزل توثيق Syntx AI داخل مجلده المستقل وتطهير الروت المشترك. | **T0 تنظيم** |
-| **7** | **سجل المراسي المركزي** | [`Root/ANCHORS.md`](file:///d:/SMS/.hRhRhRhRhRhR/Root/ANCHORS.md) | - أخذ مرساة `.anchor` لملف الدستور قبل تعديله.<br>- تحديث مسار وثيقة مواصفات Syntx AI للمسار المحلي الجديد.<br>- توثيق مرساة الدستور v1.2. | **T0 حوكمة** |
+| **1** | **نواة دستور بولا** | [`.agents/rules/00-bolla-constitution.md`](.agents/rules/00-bolla-constitution.md) | - إضافة القانون 9 (كوبري التسليم والاستئناف الحتمي).<br>- إضافة القانون 10 (العزل الهيكلي للمشاريع).<br>- تعديل سطر T1 لإلزام وثيقة المواصفات Micro-Spec مسبقاً.<br>- تحديث الـ CHANGELOG إلى v1.2. | **T1 دستوري** |
+| **2** | **الدليل الكامل للبروتوكول** | [`docs/BOLLA_PROTOCOL.md`](docs/BOLLA_PROTOCOL.md) | - تفصيل القانونين 9 و 10 وشرح حوادثهما المُولِّدة.<br>- تفصيل الفروق الدقيقة ومواعيد تحديث الثالوث (`ANCHORS.md` و `PROGRESS.md` و `HANDOFF.md`).<br>- ترقية الإصدار إلى v1.2. | **T0 توثيق** |
+| **3** | **مؤشر بروتوكول بولا** | [`__ROLE/BOLLA_PROTOCOL.md`](__ROLE/BOLLA_PROTOCOL.md) | تحديث رقم الإصدار المعتمد إلى v1.2. | **T0 توثيق** |
+| **4** | **سير عمل دستور بولا** | [`.agents/workflows/00-bolla-constitution.md`](.agents/workflows/00-bolla-constitution.md) | مزامنة النصوص الدستورية الجديدة والقوانين العشرة. | **T0 توثيق** |
+| **5** | **مهارة دستور بولا** | [`.agents/skills/00-bolla-constitution/SKILL.md`](.agents/skills/00-bolla-constitution/SKILL.md) | مزامنة المهارة بالنظام المحدث والقوانين العشرة. | **T0 توثيق** |
+| **6** | **وثيقة مواصفات Syntx AI** | نقلها من `__ROLE/` العام إلى مجلدها المعزول:<br>[`.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md`](.AAA_GGG_iii_VIBE_CODING/%F0%9F%9F%A2_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md) | عزل توثيق Syntx AI داخل مجلده المستقل وتطهير الروت المشترك. | **T0 تنظيم** |
+| **7** | **سجل المراسي المركزي** | [`Root/ANCHORS.md`](Root/ANCHORS.md) | - أخذ مرساة `.anchor` لملف الدستور قبل تعديله.<br>- تحديث مسار وثيقة مواصفات Syntx AI للمسار المحلي الجديد.<br>- توثيق مرساة الدستور v1.2. | **T0 حوكمة** |
 
 ---
 

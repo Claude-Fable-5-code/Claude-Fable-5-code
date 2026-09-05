@@ -1,0 +1,31 @@
+# Bytecode and build caches
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Sensitive data, accounts, tokens, and HAR captures
+**/*.har
+accounts.md
+*account*.py
+**/*account*.py
+*token*.py
+**/*token*.py
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+local.env
+Root/keys.txt
+**/keys.txt
+*.pem
+*.key
+demo.key
+demo.pem
+
+# Local scratch and temporary caches
+scratch/
+**/scratch/
+tmp/
+**/tmp/
