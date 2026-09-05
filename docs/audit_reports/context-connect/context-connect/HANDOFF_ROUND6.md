@@ -41,3 +41,4 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 - C4 → https://www.genspark.ai/api/files/s/1dcODg0U (HEAD 19e0143)
 - C6 → https://www.genspark.ai/api/files/s/dMGHxIVy (HEAD 500a0e6)
 - C6b → https://www.genspark.ai/api/files/s/HZisD8h7 (HEAD f1adbf4)
+- C7 → https://www.genspark.ai/api/files/s/VGrQ6yjg (HEAD 27684af)
