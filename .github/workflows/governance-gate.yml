@@ -1,0 +1,28 @@
+name: governance-gate
+# Second machine. Fails the push/PR if hooks were bypassed.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Secret scan (tracked files)
+        run: python .governance/secret_scan.py --no-remote-check
+      - name: Secret scan (full history of this push)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: python .governance/secret_scan.py --range "${{ github.event.before }}..${{ github.sha }}" --no-remote-check
+      - name: Machine-specific path scan
+        run: python .governance/path_scan.py
+      - name: Parity gate (proposed_files vs published root)
+        run: python .governance/verify_sync.py
+      - name: init_root.py behavioural probe
+        run: python .governance/probe_init_root.py

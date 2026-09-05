@@ -11,15 +11,15 @@
 
 | # | الملف | المسار الدقيق | التصنيف | طبيعة التعديل |
 |---|---|---|:---:|---|
-| **1** | **نواة دستور بولا** | [`.agents/rules/00-bolla-constitution.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/rules/00-bolla-constitution.md) | **T1** | ترقية لـ v1.2، إضافة القانونين 9 و 10، وتعديل T1 |
-| **2** | **قواعد جيميناي** | [`GEMINI.md`](file:///d:/SMS/.hRhRhRhRhRhR/GEMINI.md) | **T1** | إضافة ضوابط القانونين 9 و 10 في الممنوعات والإلزامات |
-| **3** | **مرجع الأجنتس الموحد** | [`.agents/AGENTS.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/AGENTS.md) | **T1** | ترقية لـ v2.6، إضافة المخالفتين 12 و 13، وفحص السيشن |
-| **4** | **الدليل الكامل لبروتوكول بولا** | [`docs/BOLLA_PROTOCOL.md`](file:///d:/SMS/.hRhRhRhRhRhR/docs/BOLLA_PROTOCOL.md) | **T0** | تفصيل القانونين 9 و 10 وشرح الحوادث وجدول الثالوث |
-| **5** | **مؤشر بروتوكول بولا** | [`__ROLE/BOLLA_PROTOCOL.md`](file:///d:/SMS/.hRhRhRhRhRhR/__ROLE/BOLLA_PROTOCOL.md) | **T0** | تحديث الإصدار v1.2 وتوثيق القوانين 8 و 9 و 10 |
-| **6** | **سير عمل دستور بولا** | [`.agents/workflows/00-bolla-constitution.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/workflows/00-bolla-constitution.md) | **T0** | مزامنة النصوص الدستورية وسير العمل |
-| **7** | **مهارة دستور بولا** | [`.agents/skills/00-bolla-constitution/SKILL.md`](file:///d:/SMS/.hRhRhRhRhRhR/.agents/skills/00-bolla-constitution/SKILL.md) | **T0** | مزامنة المهارة بالنظام والقوانين العشرة |
-| **8** | **سجل المراسي المركزي** | [`Root/ANCHORS.md`](file:///d:/SMS/.hRhRhRhRhRhR/Root/ANCHORS.md) | **T0** | تحديث مسار وثيقة Syntx المعزولة وتوثيق مرساة الدستور |
-| **9** | **عزل وثيقة Syntx AI** | [`.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md`](file:///d:/SMS/.hRhRhRhRhRhR/.AAA_GGG_iii_VIBE_CODING/%F0%9F%9F%A2_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md) | **T0** | إنشاء المجلد المحلي وتسكين الوثيقة داخل مشروعها |
+| **1** | **نواة دستور بولا** | [`.agents/rules/00-bolla-constitution.md`](.agents/rules/00-bolla-constitution.md) | **T1** | ترقية لـ v1.2، إضافة القانونين 9 و 10، وتعديل T1 |
+| **2** | **قواعد جيميناي** | [`GEMINI.md`](GEMINI.md) | **T1** | إضافة ضوابط القانونين 9 و 10 في الممنوعات والإلزامات |
+| **3** | **مرجع الأجنتس الموحد** | [`.agents/AGENTS.md`](.agents/AGENTS.md) | **T1** | ترقية لـ v2.6، إضافة المخالفتين 12 و 13، وفحص السيشن |
+| **4** | **الدليل الكامل لبروتوكول بولا** | [`docs/BOLLA_PROTOCOL.md`](docs/BOLLA_PROTOCOL.md) | **T0** | تفصيل القانونين 9 و 10 وشرح الحوادث وجدول الثالوث |
+| **5** | **مؤشر بروتوكول بولا** | [`__ROLE/BOLLA_PROTOCOL.md`](__ROLE/BOLLA_PROTOCOL.md) | **T0** | تحديث الإصدار v1.2 وتوثيق القوانين 8 و 9 و 10 |
+| **6** | **سير عمل دستور بولا** | [`.agents/workflows/00-bolla-constitution.md`](.agents/workflows/00-bolla-constitution.md) | **T0** | مزامنة النصوص الدستورية وسير العمل |
+| **7** | **مهارة دستور بولا** | [`.agents/skills/00-bolla-constitution/SKILL.md`](.agents/skills/00-bolla-constitution/SKILL.md) | **T0** | مزامنة المهارة بالنظام والقوانين العشرة |
+| **8** | **سجل المراسي المركزي** | [`Root/ANCHORS.md`](Root/ANCHORS.md) | **T0** | تحديث مسار وثيقة Syntx المعزولة وتوثيق مرساة الدستور |
+| **9** | **عزل وثيقة Syntx AI** | [`.AAA_GGG_iii_VIBE_CODING/🟢_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md`](.AAA_GGG_iii_VIBE_CODING/%F0%9F%9F%A2_syntx_ai/__ROLE/SYNTX_T1_IMPORTS_SPECIFICATION.md) | **T0** | إنشاء المجلد المحلي وتسكين الوثيقة داخل مشروعها |
 
 ---
 

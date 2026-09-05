@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# .governance/hooks/pre-commit — blocks commits containing secrets or machine-specific paths.
+# Installed via: bash .governance/install_hooks.sh   (sets core.hooksPath=.governance/hooks)
+set -u
+ROOT="$(git rev-parse --show-toplevel)"
+PY="${PYTHON:-python3}"; command -v "$PY" >/dev/null 2>&1 || PY=python
+rc=0
+"$PY" "$ROOT/.governance/secret_scan.py" --staged --no-remote-check || rc=1
+"$PY" "$ROOT/.governance/path_scan.py"   --staged                   || rc=1
+if [ $rc -ne 0 ]; then
+  echo
+  echo "pre-commit: BLOCKED by .governance gate. Fix the lines above."
+  echo "            (Bypassing with --no-verify is a §FATAL RULE violation and CI will still fail.)"
+fi
+exit $rc
