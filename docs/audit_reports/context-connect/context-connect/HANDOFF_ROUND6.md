@@ -39,3 +39,4 @@ a reset: after every chunk → `git format-patch origin/main` + `git bundle` cop
 ## Exports (one per chunk; newest last — the latest one supersedes all earlier ones)
 - C1 → https://www.genspark.ai/api/files/s/3fEADP2q (HEAD 9d15f36)
 - C4 → https://www.genspark.ai/api/files/s/1dcODg0U (HEAD 19e0143)
+- C6 → https://www.genspark.ai/api/files/s/dMGHxIVy (HEAD 500a0e6)
