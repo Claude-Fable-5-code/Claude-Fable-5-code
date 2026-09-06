@@ -29,3 +29,6 @@ scratch/
 **/scratch/
 tmp/
 **/tmp/
+
+# Round 14: state_gate open→close marker (per-turn, never committed)
+.governance/.state_open.json

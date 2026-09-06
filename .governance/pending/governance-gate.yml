@@ -103,6 +103,24 @@ jobs:
           python .governance/edit_proof.py --self-test
           python .governance/self_review.py --self-test
           python .governance/precheck.py --self-test
+          # R91 (Round 14, Rule 36): a rule recorded twice with no ESC row → recurrence must FAIL
+          python .governance/mistakes.py recurrence
+          printf '| 2026-01-01T00:00:00Z | 1 | 99 | a |\n| 2026-01-02T00:00:00Z | 1 | 99 | b |\n' >> .governance/MISTAKES.md
+          if python .governance/mistakes.py recurrence; then echo "recurrence passed a twice-broken rule with no ESC row (R91 missed)"; exit 1; fi
+          git checkout -- .governance/MISTAKES.md
+          # R93 (Round 14, Rule 37): placeholder code must be caught; the repo itself must be clean
+          python .governance/mock_scan.py --self-test
+          python .governance/mock_scan.py $(git ls-files | grep -E '\.(py|js|ts|sh|ps1|bat|yml|yaml|toml)$')
+          printf 'def verify_x():\n    pass  # stub\n' > /tmp/r93.py && cp /tmp/r93.py ./r93_tmp.py
+          if python .governance/mock_scan.py r93_tmp.py; then echo "mock_scan passed a stub body (R93 missed)"; exit 1; fi
+          git add r93_tmp.py
+          if python .governance/mock_scan.py --staged; then echo "mock_scan --staged passed a stub body (R93 missed)"; exit 1; fi
+          git rm -q --cached r93_tmp.py && rm r93_tmp.py
+          # R92 (Round 14, Rule 37): an edit outside --scope A-B must FAIL, inside must PASS
+          echo "# r92" >> README.md
+          python .governance/edit_proof.py show README.md --scope 1-1000
+          if python .governance/edit_proof.py show README.md --scope 1-1; then echo "edit_proof --scope passed an out-of-scope hunk (R92 missed)"; exit 1; fi
+          git checkout -- README.md
           # R85: admission with no ledger row → must FAIL
           printf 'I was wrong about the export step; I forgot it entirely and typed the verdict.\n' > /tmp/r85.md
           if python .governance/mistakes.py check /tmp/r85.md; then echo "mistakes passed an unrecorded admission (R85 missed)"; exit 1; fi
@@ -136,6 +154,24 @@ jobs:
         env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |
           if python .governance/remote_proof.py proposed_files/CHANGELOG_DECISIONS.md docs/audit_reports/context-connect/context-connect/bundles/round8_final.tar.gz --ref main; then echo "remote_proof failed to flag phantom files"; exit 1; fi
+      - name: state gate (Rule 35, Round 14) — state file current, PROGRESS present, self-tests, hook negative
+        run: |
+          set -e
+          python .governance/state_gate.py --self-test
+          python .governance/state_gate.py verify
+          # R90: a turn whose first block is not `state_gate open` must FAIL check
+          printf '```text\nprecheck t.md: 1 step(s), source=-, live=no\n✅ precheck: ok\nATTEST tool=precheck sha256=0000000000000000 utc=x head=abc0000 exit=0 cmd=x\n```\n' > /tmp/r90.md
+          if python .governance/state_gate.py check /tmp/r90.md; then echo "state_gate passed a turn that never restored state (R90 missed)"; exit 1; fi
+          # pre-commit must refuse a commit that touches code but not Root/ai_state.json
+          git clone -q . /tmp/sg && cd /tmp/sg && git config core.hooksPath .governance/hooks
+          echo "# x" >> README.md && git add README.md
+          if git -c user.email=t@t -c user.name=t commit -q -m t >/tmp/o3 2>&1; then echo "pre-commit allowed code without state"; cat /tmp/o3; exit 1; fi
+          grep -q "state must move with code" /tmp/o3
+          # R93: the same hook must also refuse a stub body (mock_scan wired into pre-commit)
+          printf 'def verify_x():\n    pass  # stub\n' > stub.py && git add stub.py
+          if git -c user.email=t@t -c user.name=t commit -q -m t >/tmp/o4 2>&1; then echo "pre-commit allowed stub code"; cat /tmp/o4; exit 1; fi
+          grep -q "mock_scan: 1 placeholder" /tmp/o4
+          echo "state gate OK"
       - name: pre-push hook behavioural test (must block main + inline credential helper, allow feature branch)
         run: |
           set -e

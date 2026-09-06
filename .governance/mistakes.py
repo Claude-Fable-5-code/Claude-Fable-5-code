@@ -5,6 +5,8 @@ mistakes.py — an admitted mistake is a ledger row, not a sentence (R85, Round 
 Usage:
     python .governance/mistakes.py record --round 13 --rule 25 "what went wrong, one line"
     python .governance/mistakes.py check <turn.md>          # exit 1 if prose admits a mistake with no row for it
+    python .governance/mistakes.py recurrence               # exit 1 if any rule has >= 2 rows and no <rule>-ESC row
+    python .governance/mistakes.py record --round 14 --rule 33-ESC "what changes so Rule 33 cannot break a third time"
     python .governance/mistakes.py --self-test
 
 Why this exists (Round 13, RECONSTRUCTED after reset). Across Rounds 6-12 the agent wrote "I was wrong",
@@ -21,6 +23,13 @@ a row in `.governance/MISTAKES.md`:
            Otherwise exit 1 and print the unrecorded sentence.
 
 Only prose is scanned; a quoted admission inside a tool block is not an admission.
+
+Round 14 (R91, Rule 36) — recurrence. The ledger recorded Rule 33 twice in Round 13 and nothing noticed.
+  recurrence → groups rows by rule (the numeric part). A rule with >= 2 plain rows needs an ESCALATION row
+               (`rule` column = `<n>-ESC`, `what` = the mechanical change that makes a third occurrence
+               impossible) dated at or after the second occurrence. Missing ESC row → exit 1. Runs in
+               precheck (step after `mistakes check`) and in CI, so a repeated mistake blocks every turn
+               until the escalation is written down.
 """
 import datetime, pathlib, re, sys
 
@@ -102,9 +111,46 @@ def check(path: str) -> int:
     print("✅ mistakes: every admission has a ledger row"); return 0
 
 
+def recurrence_text(ledger_rows):
+    """Return (problems, {rule: count})."""
+    plain, esc = {}, {}
+    for utc, rnd, rule, what in ledger_rows:
+        m = re.fullmatch(r"(\d+)(-ESC)?", rule.strip(), re.I)
+        if not m:
+            continue
+        (esc if m.group(2) else plain).setdefault(m.group(1), []).append(utc)
+    problems = []
+    for rule, utcs in sorted(plain.items(), key=lambda kv: int(kv[0])):
+        if len(utcs) < 2:
+            continue
+        second = sorted(utcs)[1]
+        if not any(u >= second for u in esc.get(rule, [])):
+            problems.append(f"rule {rule} broken {len(utcs)}× (last {sorted(utcs)[-1]}) with no {rule}-ESC row — repetition without escalation")
+    return problems, {r: len(u) for r, u in plain.items()}
+
+
+def recurrence() -> int:
+    problems, counts = recurrence_text(rows())
+    repeated = {r: c for r, c in counts.items() if c >= 2}
+    print(f"mistakes recurrence: {len(rows())} row(s), {len(repeated)} rule(s) repeated, {len(problems)} unescalated")
+    for r, c in sorted(repeated.items(), key=lambda kv: int(kv[0])):
+        print(f"  | rule {r} | {c}× |")
+    for p in problems:
+        print(f"🔴 {p}")
+    if problems:
+        print(f"⛔ mistakes: {len(problems)} repeated rule(s) without an ESC row — a mistake made twice needs a mechanism, not a third apology (Rule 36)"); return 1
+    print("✅ mistakes: no unescalated recurrence"); return 0
+
+
 def self_test() -> int:
     ok = True
     fake = [("2026-01-01T00:00:00Z", "12", "25", "claimed PROGRESS.md updated without remote_proof block")]
+    # R91: recurrence
+    twice = [("2026-01-01T00:00:00Z", "13", "33", "a"), ("2026-01-02T00:00:00Z", "13", "33", "b")]
+    p, c = recurrence_text(twice); ok &= len(p) == 1 and c["33"] == 2                                       # 6) twice, no ESC → problem
+    p, c = recurrence_text(twice + [("2026-01-03T00:00:00Z", "14", "33-ESC", "hook")]); ok &= not p        # 7) ESC after 2nd → ok
+    p, c = recurrence_text(twice + [("2025-12-31T00:00:00Z", "13", "33-ESC", "early")]); ok &= len(p) == 1  # 8) ESC before 2nd → still problem
+    p, c = recurrence_text(fake); ok &= not p                                                                # 9) single row → ok
     # 1) admission, no matching row → problem
     p, a, r = check_text("I was wrong: I typed the claim_check verdict in prose.\n", fake)
     ok &= a == 1 and r == 0 and len(p) == 1
@@ -122,7 +168,7 @@ def self_test() -> int:
     # 5) no admission at all
     p, a, r = check_text("All checks passed; see blocks above.\n", [])
     ok &= a == 0 and not p
-    print("✅ mistakes self-test ok (unrecorded fails / ledger match / same-turn record / block-only ignored / none)" if ok
+    print("✅ mistakes self-test ok (unrecorded fails / ledger match / same-turn record / block-only ignored / none / recurrence ×4)" if ok
           else "⛔ mistakes self-test FAILED")
     return 0 if ok else 1
 
@@ -132,6 +178,8 @@ def main(argv):
         return self_test()
     if len(argv) >= 2 and argv[0] == "check":
         return check(argv[1])
+    if argv and argv[0] == "recurrence":
+        return recurrence()
     if argv and argv[0] == "record":
         rnd = rule = "?"; rest = []
         it = iter(argv[1:])

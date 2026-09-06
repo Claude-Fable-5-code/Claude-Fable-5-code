@@ -1,10 +1,10 @@
 {
-  "mode": "[DONE]",
-  "current_tag": "[ROUND10-INTEGRATED-LOCAL]",
-  "turn_count": 297,
-  "git_commit": "e9d0bbe",
-  "last_action": "اكتمال دمج PR #9 في main بالكوميت e9d0bbe بنجاح، واستلام حزمة Round 10 وتثبيت أداة attest.py وقاعدة Rule 21 والتغطية الكاملة 100% req_coverage --full (Rule 23) وتشميع المرساة agent_hard_rules_r10 برقم 59cf75cb وأرشفة الحزم.",
-  "next_action": "تشغيل الأدوات عبر attest.py وتجهيز التقرير الصارم للجولة العاشرة متضمناً أختام ATTEST المشفرة.",
+  "mode": "[ACT]",
+  "current_tag": "[ROUND14-C7]",
+  "turn_count": 306,
+  "git_commit": "463a967",
+  "last_action": "C7: Round 14 squashed into one commit (C0-C6c). Rules 35-37 (R90-R94): state_gate.py, mistakes recurrence + 33-ESC, edit_proof --scope, mock_scan.py in hook+CI, guide corrected, 7 skills, review --full 555/555, handoff.",
+  "next_action": "Owner: apply latest archive (git am), push -f genspark_ai_developer, open PR, wait CI + 300s floor, merge manually. Next session: state_gate open first; read MISTAKES.md; Round 15 preflight audit of whatever CI reveals.",
   "last_message_summary": "استلام تقرير وحزمة Round 10 من الاستشاري، شرح اكتشافات الجولة 10 (الكتل المصطنعة وحلها بـ attest)، وتثبيت المرساة r10 بنجاح.",
-  "last_updated": "2026-09-06T13:52:00+03:00"
+  "last_updated": "2026-09-06T17:55:08Z"
 }

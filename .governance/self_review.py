@@ -17,15 +17,17 @@ AND evidence, and rejects the block when it is all-✅ without an explicit reaso
   Q4 pleasing:   the sentence most likely written to please, quoted verbatim (or "none")
   Q5 re-read:    I re-read the human message after drafting                  ✅/❌  missed: «verbatim quote» | none missed
   Q6 remote:     anything called updated/saved/pushed has remote_proof REMOTE ✅/❌  evidence: … | none — nothing claimed
+  Q7 state:      state_gate close --write ran on THIS turn (Round 14, Rule 35) ✅/❌  evidence: sha256=<16> of the close block
 
 Checks (each is a printed problem):
-  S1 block present, all six Q-lines present, in order
+  S1 block present, all seven Q-lines present, in order
   S2 Q1/Q2 ✅ require `sha256=<16 hex>` that matches a footer sha of a block IN THIS TURN
   S3 Q3 is "none" only if the turn contains ≥ 3 distinct tool families (you cannot have skipped nothing with one block)
   S4 Q4 quote (if not "none") must appear verbatim in the PROSE of this turn
   S5 Q5 ✅ requires the `missed:` field; if it quotes a sentence, that sentence must be verbatim in --human (when given)
   S6 Q6 ✅ requires a remote_proof block with "✅ remote_proof: all paths match remote"; ❌ requires "evidence: none"
   S7 at least one ❌ OR every ✅ carries evidence that S2/S5/S6 verified — all-✅ with no verifiable evidence fails
+  S8 Q7 ✅ requires sha256=<16> of a state_gate block IN THIS TURN whose body says "✅ state_gate: close"; ❌ requires "evidence: none"
 """
 import pathlib, re, sys
 
@@ -34,7 +36,7 @@ sys.path.insert(0, str(GOV))
 from claim_check import prose_and_blocks  # noqa: E402
 from attest import FOOT  # noqa: E402
 
-QS = ["Q1 attested:", "Q2 prechecked:", "Q3 skipped:", "Q4 pleasing:", "Q5 re-read:", "Q6 remote:"]
+QS = ["Q1 attested:", "Q2 prechecked:", "Q3 skipped:", "Q4 pleasing:", "Q5 re-read:", "Q6 remote:", "Q7 state:"]
 SHA = re.compile(r"sha256=([0-9a-f]{16})")
 NONE = re.compile(r"^\s*none\b", re.I)
 
@@ -121,6 +123,20 @@ def check_text(text: str, human: str | None = None):
         # all ✅ AND all verified — allowed only when the evidence was verifiable (S2 shas matched, S6 rp_ok)
         if not rp_ok:
             problems.append("S7: all-✅ review but no remote_proof REMOTE — at least one ❌ was due")
+    # S8 (Round 14, Rule 35)
+    a7 = q.get("Q7 state:", "")
+    close_shas = {FOOT.match(b[-1].strip()).group(2) for t, _, b in bl
+                  if t == "state_gate" and b and FOOT.match(b[-1].strip()) and any("✅ state_gate: close" in l for l in b)}
+    if _mark(a7) == "✅":
+        m = SHA.search(a7)
+        if not m:
+            problems.append("S8: Q7 ✅ without sha256=<16> evidence")
+        elif m.group(1) not in close_shas:
+            problems.append(f"S8: Q7 sha {m.group(1)} is not the footer of a ✅ state_gate close block in this turn")
+    elif _mark(a7) == "❌" and "evidence: none" not in a7.lower():
+        problems.append("S8: Q7 ❌ must say 'evidence: none'")
+    elif a7 and _mark(a7) is None:
+        problems.append("S8: Q7 state: has no ✅/❌ mark")
     return problems, len(bl)
 
 
@@ -142,12 +158,18 @@ def self_test() -> int:
     b1 = "```text\nmistakes x: 0 admission(s), 0 recorded, ledger rows=2\nℹ️  mistakes: no admission in this turn — nothing to record\n" + foot.format(t="mistakes", s="a" * 16) + "\n```\n"
     b2 = "```text\nremote_proof o@m: 1 path(s)\n  🔴 MISSING x  local exists, NOT on remote  ← y\n⛔ remote_proof: 1 of 1 path(s) not proven on remote\n" + foot.format(t="remote_proof", s="b" * 16) + "\n```\n"
     b3 = "```text\nintent_gate verify: mode=ACT\n" + foot.format(t="intent_gate", s="c" * 16) + "\n```\n"
+    b4 = "```text\nstate_gate close: head=abc0000 state=abc0000 turn=1→2 written=yes\n✅ state_gate: close — state advanced to HEAD\n" + foot.format(t="state_gate", s="d" * 16) + "\n```\n"
     prose = "I re-checked everything and it works.\n"
     good = ("```self-review\nQ1 attested:   ✅  evidence: sha256=" + "a" * 16 + "\nQ2 prechecked: ✅  evidence: sha256=" + "c" * 16 +
             "\nQ3 skipped:    attest --live — blocks are seconds old\nQ4 pleasing:   «I re-checked everything and it works.»\n"
-            "Q5 re-read:    ✅  missed: «push-per-chunk»\nQ6 remote:     ❌  evidence: none — remote_proof says MISSING\n```\n")
+            "Q5 re-read:    ✅  missed: «push-per-chunk»\nQ6 remote:     ❌  evidence: none — remote_proof says MISSING\n"
+            "Q7 state:      ✅  evidence: sha256=" + "d" * 16 + "\n```\n")
     human = "أنفّذ بchunks صغيرة مدفوعة (push-per-chunk لمقاومة الـresets)"
-    p, n = check_text(b1 + b2 + b3 + prose + good, human); ok &= not p and n == 3
+    p, n = check_text(b1 + b2 + b3 + b4 + prose + good, human); ok &= not p and n == 4
+    # Q7 ✅ citing a non-close sha (S8)
+    p, _ = check_text(b1 + b2 + b3 + b4 + prose + good.replace("sha256=" + "d" * 16, "sha256=" + "a" * 16)); ok &= any("S8" in x for x in p)
+    # Q7 missing (S1)
+    p, _ = check_text(b1 + b2 + b3 + b4 + prose + good.replace("Q7 state:      ✅  evidence: sha256=" + "d" * 16 + "\n", "")); ok &= any("S1: missing Q7" in x for x in p)
     # no block
     p, _ = check_text(b1 + prose); ok &= any(x.startswith("S1") for x in p)
     # sha not in turn
@@ -161,7 +183,7 @@ def self_test() -> int:
     p, _ = check_text(b1 + b2 + b3 + prose + good.replace("«push-per-chunk»", "«something else»"), human); ok &= any("S5" in x for x in p)
     # Q3 none with 1 family
     p, _ = check_text(b1 + prose + good.replace("attest --live — blocks are seconds old", "none").replace("c" * 16, "a" * 16)); ok &= any("S3" in x for x in p)
-    print("✅ self_review self-test ok (good passes / no block / foreign sha / Q6 ✅ w/o REMOTE / Q4 not verbatim / Q5 not in human / Q3 none)" if ok
+    print("✅ self_review self-test ok (good passes / no block / foreign sha / Q6 ✅ w/o REMOTE / Q4 not verbatim / Q5 not in human / Q3 none / Q7 S8+S1)" if ok
           else "⛔ self_review self-test FAILED")
     return 0 if ok else 1
 

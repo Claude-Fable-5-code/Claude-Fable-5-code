@@ -15,6 +15,14 @@ fi
 rc=0
 "$PY" "$ROOT/.governance/secret_scan.py" --staged --no-remote-check || rc=1
 "$PY" "$ROOT/.governance/path_scan.py"   --staged                   || rc=1
+# Round 14 (R93, Rule 37): no TODO/stub/placeholder/mock code may be committed. Opt-out per line: # mock-scan:allow
+"$PY" "$ROOT/.governance/mock_scan.py"   --staged                   || rc=1
+# Round 14 (R90, Rule 35): state moves with code. Any staged file ⇒ Root/ai_state.json must be staged,
+# point at HEAD or HEAD~1, carry a next_action, and Root/PROGRESS.md must exist. Bypass: STATE_GATE_SKIP=1
+# (allowed only for the commit that creates the state files themselves; the CI step has no bypass).
+if [ "${STATE_GATE_SKIP:-0}" != "1" ]; then
+  "$PY" "$ROOT/.governance/state_gate.py" verify --staged || rc=1
+fi
 if [ $rc -ne 0 ]; then
   echo
   echo "pre-commit: BLOCKED by .governance gate. Fix the lines above."

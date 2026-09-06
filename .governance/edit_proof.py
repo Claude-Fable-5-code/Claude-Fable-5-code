@@ -4,6 +4,7 @@ edit_proof.py — "I edited X" is a claim about a diff, proven by the diff (R86,
 
 Usage:
     python .governance/edit_proof.py show <path> [<path>…]    # print an edit-proof block per path (run via attest.py)
+    python .governance/edit_proof.py show <path> --scope A-B   # + every diff hunk must sit inside HEAD lines A..B (R92, Rule 37)
     python .governance/edit_proof.py check <turn.md>          # exit 1 if prose claims an edit with no matching proof
     python .governance/edit_proof.py --self-test
 
@@ -24,6 +25,12 @@ Rule 18/25 already covers "updated on remote"; nothing covered "edited locally".
            "أصلحت", "صلحت", "غيّرت", "غيرت", "ضفت", "أضفت", "added … to") followed within the sentence by a file
            path. Each such path needs an edit_proof block in the same turn with state ≠ UNCHANGED whose sha256
            matches the file on disk now. Otherwise exit 1 and print the unproven claim.
+
+  --scope A-B (Round 14, R92, Rule 37). The guide promised "edit only lines A-B" could be proven; the tool read
+           `git diff --numstat` and could not see WHERE a change landed. Now `show` parses `git diff -U0 HEAD`
+           hunks. A hunk `@@ -a,b +c,d @@` touches HEAD lines a..a+b-1 (b=0: pure insertion after line a).
+           Every hunk must lie inside [A,B] (insertion: A-1 ≤ a ≤ B). One hunk outside ⇒
+             ⛔ edit_proof: <path> OUT-OF-SCOPE  … exit 1.  Scope is HEAD numbering, so it is what the human read.
 """
 import hashlib, pathlib, re, subprocess, sys
 
@@ -74,10 +81,63 @@ def show_one(path: str):
     return out, state
 
 
-def show(paths) -> int:
+HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
+
+
+def hunks(path: str):
+    """[(old_start, old_len, new_start, new_len)] from `git diff -U0 HEAD -- path` (index+tree vs HEAD)."""
+    out = []
+    for ln in git("diff", "-U0", "HEAD", "--", path).splitlines():
+        m = HUNK.match(ln)
+        if m:
+            a, b, c, d = (int(x) if x is not None else 1 for x in m.groups())
+            out.append((a, b, c, d))
+    return out
+
+
+def in_scope(h, lo: int, hi: int) -> bool:
+    a, b, _, _ = h
+    if b == 0:  # pure insertion after HEAD line a
+        return lo - 1 <= a <= hi
+    return lo <= a and a + b - 1 <= hi
+
+
+def scope_lines(path: str, lo: int, hi: int):
+    """Extra block lines + verdict for --scope. Returns (lines, ok)."""
+    if not git("ls-files", "--error-unmatch", path):
+        return [f"  scope {lo}-{hi}: file not in HEAD — scope cannot apply"], False
+    hs = hunks(path)
+    if not hs:
+        return [f"  scope {lo}-{hi}: 0 hunk(s)"], True
+    lines, bad = [f"  scope {lo}-{hi}: {len(hs)} hunk(s)"], 0
+    for h in hs:
+        ok = in_scope(h, lo, hi)
+        bad += not ok
+        lines.append(f"  @@ -{h[0]},{h[1]} +{h[2]},{h[3]} @@ {'in-scope' if ok else 'OUT-OF-SCOPE'}")
+    return lines, bad == 0
+
+
+def parse_scope(argv):
+    """Strip `--scope A-B` from argv; return (paths, (A,B) | None). Malformed ⇒ SystemExit(2)."""
+    if "--scope" not in argv:
+        return argv, None
+    i = argv.index("--scope")
+    m = re.fullmatch(r"(\d+)-(\d+)", argv[i + 1] if i + 1 < len(argv) else "")
+    if not m or int(m.group(1)) < 1 or int(m.group(1)) > int(m.group(2)):
+        print("⛔ edit_proof: --scope needs A-B with 1 ≤ A ≤ B"); raise SystemExit(2)
+    return argv[:i] + argv[i + 2:], (int(m.group(1)), int(m.group(2)))
+
+
+def show(paths, scope=None) -> int:
     rc = 0
     for path in paths:
         out, state = show_one(path)
+        if scope is not None:
+            extra, ok = scope_lines(path, *scope)
+            out[-1:-1] = extra  # before the verdict line
+            if not ok:
+                out[-1] = f"⛔ edit_proof: {path} OUT-OF-SCOPE — a hunk landed outside lines {scope[0]}-{scope[1]} (Rule 37)"
+                rc |= 1
         print("\n".join(out))
         rc |= int(state == "UNCHANGED")
     return rc
@@ -158,7 +218,23 @@ def self_test() -> int:
     # 5) edit verb inside tool block only → no claim
     p, c, n = check_text("```text\nedited foo.py\nATTEST tool=attest sha256=0000000000000000 utc=2026-01-01T00:00:00Z head=abc0000 exit=0 cmd=x\n```\n")
     ok &= c == 0 and not p
-    print("✅ edit_proof self-test ok (show / no-proof fails / live proof passes / UNCHANGED fails / stale fails / block-only ignored)" if ok
+    # 6) scope arithmetic (R92): hunk (10,3,·,·) touches HEAD 10-12; insertion (12,0) sits after line 12
+    ok &= in_scope((10, 3, 10, 3), 10, 12) and not in_scope((10, 3, 10, 3), 11, 20) and not in_scope((9, 1, 9, 1), 10, 12)
+    ok &= in_scope((12, 0, 13, 4), 10, 12) and in_scope((9, 0, 10, 4), 10, 12) and not in_scope((13, 0, 14, 1), 10, 12)
+    # 7) real diff on an untracked scratch file → "cannot apply" + not ok ; scope parser rejects B<A
+    scratch = ROOT / ".governance" / ".edit_proof_selftest.tmp"
+    scratch.write_text("x\n", encoding="utf-8")
+    try:
+        lines, sok = scope_lines(".governance/.edit_proof_selftest.tmp", 1, 5)
+        ok &= not sok and "cannot apply" in lines[0]
+    finally:
+        scratch.unlink()
+    try:
+        parse_scope(["show", "a.py", "--scope", "9-3"]); ok = False
+    except SystemExit as e:
+        ok &= e.code == 2
+    ok &= parse_scope(["show", "a.py", "--scope", "3-9"]) == (["show", "a.py"], (3, 9))
+    print("✅ edit_proof self-test ok (show / no-proof fails / live proof passes / UNCHANGED fails / stale fails / block-only ignored / scope ×3)" if ok
           else "⛔ edit_proof self-test FAILED")
     return 0 if ok else 1
 
@@ -166,8 +242,9 @@ def self_test() -> int:
 def main(argv):
     if "--self-test" in argv:
         return self_test()
+    argv, scope = parse_scope(list(argv))
     if len(argv) >= 2 and argv[0] == "show":
-        return show(argv[1:])
+        return show(argv[1:], scope)
     if len(argv) >= 2 and argv[0] == "check":
         return check(argv[1])
     print(__doc__); return 2
