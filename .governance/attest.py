@@ -60,6 +60,22 @@ TOOLS = {  # header regex → (tool, allowed line regexes)
         r"^read_proof \S+: \d+ lines sha256=[0-9a-f]{12}$", r"^  L\d+-L\d+  .*$",
         r"^🔴 .*$", r"^(⛔|✅|ℹ️ ) ?read_proof: .*$",
     ],
+    "mistakes": [  # Round 13 (R85, Rule 30)
+        r"^mistakes (record: round=\S+ rule=\S+ rows=\d+|\S+: \d+ admission\(s\), \d+ recorded, ledger rows=\d+)$",
+        r"^  \| .* \|$", r"^🔴 unrecorded admission: .*$", r"^(⛔|✅|ℹ️ ) ?mistakes: .*$",
+    ],
+    "edit_proof": [  # Round 13 (R86, Rule 31)
+        r"^edit_proof \S+: (MODIFIED|STAGED|COMMITTED-IN-HEAD|UNTRACKED|UNCHANGED) sha256=[0-9a-f]{12}$",
+        r"^edit_proof \S+: \d+ edit claim\(s\), \d+ proof block\(s\)$",
+        r"^  (\+\d+ -\d+  \(vs HEAD\)|committed [0-9a-f]{7} .*|head=[0-9a-f]{7})$", r"^🔴 .*$", r"^(⛔|✅|ℹ️ ) ?edit_proof: .*$",
+    ],
+    "self_review": [  # Round 13 (R87, Rule 32)
+        r"^self_review \S+: \d+ tool block\(s\) in turn$", r"^🔴 S[1-7]: .*$", r"^(⛔|✅) self_review: .*$",
+    ],
+    "precheck": [  # Round 13 (R88, Rule 34)
+        r"^precheck \S+: \d+ step\(s\), source=\S+, live=(yes|no)(, skipped=\S+)?$",
+        r"^  \d+\. [a-z_]+\s+exit=-?\d+  .*$", r"^(⛔|✅) precheck: .*$",
+    ],
     "attest": [r"^.*$"],
 }
 FOOT = re.compile(r"^ATTEST tool=(\S+) sha256=([0-9a-f]{16}) utc=(\S+) head=([0-9a-f]{7}) exit=(-?\d+) cmd=(.*)$")

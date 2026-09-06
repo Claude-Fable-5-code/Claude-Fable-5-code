@@ -35,4 +35,5 @@ Splitting a long message into tasks is allowed. Dropping any of it is not (FULL_
 The union of all task quotes must equal the message file: req_coverage --full exit 0 over the whole turn,
 not per task. If a fragment fits no task, it goes in a LEFTOVER «…» line with a reason — never silently.
 Round 12: if intent_gate says CONFIRM-FIRST, do NOT split into tasks yet — mirror first, tasks after تمام (Rule 27).
+Round 13 (R85-R89 — Rules 30-34): (a) PLAN_ROUND<N>.md is the FIRST commit; every chunk = commit + `export_bundle.sh` + upload, URL into the plan — no URL, no tick; if `setup_github_environment` has no token, export immediately, do not try `git push`. (b) "I was wrong / غلطت" needs a `mistakes.py record` row in MISTAKES.md. (c) "edited / عدّلت <file>" needs an `attest run -- edit_proof.py show <file>` block (not UNCHANGED). (d) The self-review is six fixed questions (`self_review.py`); all-✅ with no REMOTE proof fails. (e) `attest run -- precheck.py <turn> --source <human>` is pasted before sending; its sha is Q2.
 ```

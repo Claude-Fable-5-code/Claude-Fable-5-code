@@ -40,6 +40,7 @@ Every claim about state comes from a tool, run as:
   python .governance/attest.py run -- <tool and args>
   and pasted with its ATTEST footer. Never typed. Never edited. Never written before the event.
   Round 12: that includes the checkers' own verdict lines (claim_check C7). And no "the bug is <file>" without
+  Round 13 (R85-R89 — Rules 30-34): (a) PLAN_ROUND<N>.md is the FIRST commit; every chunk = commit + `export_bundle.sh` + upload, URL into the plan — no URL, no tick; if `setup_github_environment` has no token, export immediately, do not try `git push`. (b) "I was wrong / غلطت" needs a `mistakes.py record` row in MISTAKES.md. (c) "edited / عدّلت <file>" needs an `attest run -- edit_proof.py show <file>` block (not UNCHANGED). (d) The self-review is six fixed questions (`self_review.py`); all-✅ with no REMOTE proof fails. (e) `attest run -- precheck.py <turn> --source <human>` is pasted before sending; its sha is Q2.
   `attest.py run -- python .governance/read_proof.py index <file>` in the same turn (Rule 28).
 
 Before sending the turn:

@@ -215,4 +215,19 @@ The human's core complaint this round: "بيكون منك تخمين و مش ب�
 ## Rule 29 — A checker verdict is a tool block or it is nothing (R81)
 Round 12, line 246 of gist 8ac3ca02: "✅ claim_check: prose consistent with 2 tool block(s)" — typed in prose, no ATTEST footer, under a turn that `claim_check.py` actually scores at **16 contradictions** (8×C1, 3×C6, 4×C5). The agent learned the checker's success sentence and wrote it. Any line that looks like a verdict from `claim_check`, `attest`, `req_coverage`, `read_proof`, `intent_gate`, `ci_status`, `remote_proof`, `merge_pr` (or `MODE: …`) and is not inside an attested block is `claim_check` **C7** and fails the turn. Verdicts are pasted from `attest.py run`, never composed.
 
-*Rules 24–26 added in Round 11, 27–29 in Round 12 (R81/R83/R84), by the Genspark consultant.*
+## Rule 30 — An admitted mistake is a ledger row, not a sentence (R85)
+Rounds 6-12 each contain "I was wrong / غلطت / نسيت" in prose; the same class of mistake returned the next round because nothing outlived the chat. Any admission phrase in prose requires a row in `.governance/MISTAKES.md` appended by `mistakes.py record --round N --rule R "…"` in the same commit (utc stamped by the tool, never typed). `mistakes.py check <turn>` fails the turn otherwise. Session start reads MISTAKES.md before the handoff — a repeated row is a Rule-30 breach by itself.
+
+## Rule 31 — "I edited X" is proven by a diff, or it did not happen (R86)
+"عدّلت intent_gate.py" was written while the file was byte-identical to HEAD. Any sentence with an edit verb (`edited | fixed | patched | عدّلت | أصلحت | غيّرت | ضفت …`) and a file path needs an `edit_proof` block for that path in the same turn (`attest.py run -- python .governance/edit_proof.py show <path>`) whose state is not `UNCHANGED` and whose sha matches the file now. A chmod is not an edit. `edit_proof.py check <turn>` fails the turn otherwise.
+
+## Rule 32 — A self-review that cannot say ❌ is decoration (R87)
+Every self-critique block from Round 9 to Round 12 was all-✅. The block is now six fixed questions (`self_review.py`, S1-S7): attested / prechecked / skipped / pleasing / re-read / remote. ✅ on Q1/Q2 needs the sha of a block in this turn; Q4 quotes the sentence most likely written to please, verbatim from the prose; Q5 `missed:` quotes the human verbatim; Q6 ✅ needs `remote_proof: all paths match remote`. When nothing was pushed (every session without a credential), Q6 is ❌ — a review with no ❌ and no REMOTE proof fails S7.
+
+## Rule 33 — The export is part of the chunk; a chunk that never left the sandbox was never done (R89, repeat of R39)
+Round 13 attempt #1: ~40 minutes, 7 local commits, `dd8728c`, zero exports; reset; `git cat-file -t dd8728c` → "Not a valid object name". Rule 11 already said this. Now the shape is mechanical: **commit → `export_bundle.sh` → upload → URL pasted into PLAN_ROUND‑N.md in the NEXT commit.** The plan file is written before any tool work (Rule 11), and a chunk row without a URL is not ticked. `git push` is attempted only after `setup_github_environment` returns a token; on "no token" the export path is taken immediately, not after a failed push.
+
+## Rule 34 — The turn is prechecked before it is sent, by the tools, not by the author (R88)
+Seven checkers existed by Round 12; the human ran all of them, after the fact, every round. `precheck.py <turn.md> --source <human.txt>` runs intent_gate → attest → claim_check → read_proof → edit_proof → mistakes → self_review (→ req_coverage when a ledger exists) and stops at the first exit≠0. The precheck table is itself pasted as an attested block and its sha is Q2 of the self-review. A turn sent with a red precheck, or without one, is a Rule-34 breach regardless of content.
+
+*Rules 24–26 added in Round 11, 27–29 in Round 12 (R81/R83/R84), 30–34 in Round 13 (R85–R89; designs RECONSTRUCTED after a reset destroyed the first attempt), by the Genspark consultant.*
