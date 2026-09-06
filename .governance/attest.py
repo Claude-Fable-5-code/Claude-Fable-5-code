@@ -96,7 +96,7 @@ def h(s: str) -> str:
 
 def head() -> str:
     try:
-        return subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], capture_output=True, text=True, cwd=GOV.parent).stdout.strip() or "0000000"
+        return subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=GOV.parent).stdout.strip() or "0000000"
     except Exception:
         return "0000000"
 
@@ -177,7 +177,7 @@ def verify(path: str, live: bool) -> int:
             print(f"🔴 TAMPERED   [{tool}] footer sha {fh} != body sha {want} — block edited after run"); bad += 1; continue
         if live:
             try:
-                p = subprocess.run(shlex.split(cmd), capture_output=True, text=True, cwd=GOV.parent, timeout=120)
+                p = subprocess.run(shlex.split(cmd), capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=GOV.parent, timeout=120)
                 now = (p.stdout + p.stderr).rstrip("\n")
                 if h(now) != fh:
                     # R79 (Round 11, self-finding): ci_status / remote_proof describe REMOTE STATE, which legitimately

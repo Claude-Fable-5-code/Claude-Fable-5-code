@@ -1,0 +1,8 @@
+# Round 15 (R97): line endings are decided by the repo, not by the committer's OS.
+* text=auto eol=lf
+*.patch -text
+*.bundle binary
+*.tar.gz binary
+*.png binary
+*.jpg binary
+*.ico binary

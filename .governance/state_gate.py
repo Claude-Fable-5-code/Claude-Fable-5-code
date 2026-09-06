@@ -24,8 +24,14 @@ read the file. ai_state.json sat 10 commits behind HEAD. A promise with no tool 
   check   the turn's FIRST tool block is `state_gate open`, ONE `state_gate close` block exists with exit=0 and
           a ✅ verdict, and every tool block after close is a turn-closing one (precheck/self_review/attest/
           state_gate). Anything else after close = work done after the state was sealed → exit 1.
-  verify  repo-level (hook + CI): ai_state.json parses, git_commit ∈ {HEAD, HEAD~1}, next_action non-empty,
-          Root/PROGRESS.md exists and is non-empty. --staged reads ai_state.json from the index and demands
+  verify  repo-level (hook + CI): ai_state.json parses, git_commit ∈ allowed(HEAD), next_action non-empty,
+          Root/PROGRESS.md exists and is non-empty. allowed(HEAD) = {HEAD, HEAD~1} for an ordinary commit; for a
+          MERGE commit (2+ parents — GitHub's "Merge pull request") it also includes every parent and each
+          non-first parent's own parent, because the PR head's ai_state.json legally points at HEAD~1 *of the
+          branch*, not of main (R95, Round 15: main went red after PR #14 for exactly this reason).
+  Both open and close print `remaining=N` = number of `- [ ]` lines in Root/PROGRESS.md — the tool-stamped
+  answer to "فاضل حاجة ولا خلاص؟" (Round 15). N=0 → nothing remains.
+  Every write uses newline="\n" so a Windows Python cannot turn the state file into CRLF (R97). --staged reads ai_state.json from the index and demands
           it be staged whenever any other file is staged ("state moves with code").
 """
 import datetime, json, pathlib, re, subprocess, sys, tempfile
@@ -56,6 +62,28 @@ def parse_ts(s: str):
         return None
 
 
+def remaining(root) -> int:
+    """Count of open `- [ ]` checklist lines in Root/PROGRESS.md (0 when the file is missing)."""
+    prog = root / PROGRESS
+    if not prog.exists():
+        return 0
+    return sum(1 for l in prog.read_text(encoding="utf-8", errors="replace").splitlines() if l.lstrip().startswith("- [ ]"))
+
+
+def allowed_state_commits(root) -> list:
+    """Short SHAs a committed ai_state.json may legally point at for the current HEAD (R95)."""
+    parents = git(root, "rev-list", "--parents", "-n1", "HEAD").split()
+    head, ps = parents[0] if parents else "", parents[1:] if parents else []
+    out = [head[:7]] if head else []
+    for i, p in enumerate(ps):
+        out.append(p[:7])
+        if i > 0:                                   # non-first parent = the PR head; its own HEAD~1 is legal too
+            pp = git(root, "rev-parse", "--short=7", f"{p}~1")
+            if pp:
+                out.append(pp)
+    return [x for x in out if x]
+
+
 def load_state(root, staged=False):
     raw = git(root, "show", f":{STATE}") if staged else (root / STATE).read_text(encoding="utf-8") if (root / STATE).exists() else ""
     try:
@@ -84,8 +112,8 @@ def cmd_open(root, ack: bool) -> int:
     print(f"state_gate open: head={head} state={sc} drift={d if d >= 0 else '?'} turn={turn}")
     print(f"  tag={st.get('current_tag', '-')}  mode={st.get('mode', '-')}")
     print(f"  next={str(st.get('next_action', ''))[:120]}")
-    print(f"  progress={'ok' if plines else 'MISSING'} ({plines} lines)")
-    (root / MARK).write_text(json.dumps({"utc": utcnow(), "head": head, "turn_count": turn}), encoding="utf-8")
+    print(f"  progress={'ok' if plines else 'MISSING'} ({plines} lines)  remaining={remaining(root)}")
+    (root / MARK).write_text(json.dumps({"utc": utcnow(), "head": head, "turn_count": turn}), encoding="utf-8", newline="\n")
     if d == 0:
         print("✅ state_gate: open — state matches HEAD"); return 0
     if ack:
@@ -109,7 +137,7 @@ def cmd_close(root, write: bool, opts: dict) -> int:
         for k, key in (("next", "next_action"), ("last", "last_action"), ("tag", "current_tag"), ("mode", "mode")):
             if opts.get(k):
                 st[key] = opts[k]
-        (root / STATE).write_text(json.dumps(st, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        (root / STATE).write_text(json.dumps(st, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     bad = []
     if int(st.get("turn_count", -1)) != int(op["turn_count"]) + 1:
         bad.append(f"turn_count {st.get('turn_count')} != open {op['turn_count']}+1")
@@ -122,6 +150,7 @@ def cmd_close(root, write: bool, opts: dict) -> int:
         bad.append("next_action empty")
     print(f"state_gate close: head={head} state={str(st.get('git_commit', ''))[:7] or '???????'} turn={op['turn_count']}→{st.get('turn_count')} written={'yes' if write else 'no'}")
     print(f"  next={str(st.get('next_action', ''))[:120]}")
+    print(f"  remaining={remaining(root)}")
     for b in bad:
         print(f"🔴 {b}")
     if bad:
@@ -162,7 +191,10 @@ def cmd_check(path: str) -> int:
 
 def cmd_verify(root, staged: bool) -> int:
     head = git(root, "rev-parse", "--short=7", "HEAD") or "0000000"
+    allowed = allowed_state_commits(root) or [head]
     prev = git(root, "rev-parse", "--short=7", "HEAD~1")
+    if prev and prev not in allowed:
+        allowed.append(prev)
     bad = []
     if staged:
         files = [f for f in git(root, "diff", "--cached", "--name-only").splitlines() if f]
@@ -173,8 +205,8 @@ def cmd_verify(root, staged: bool) -> int:
     if err:
         bad.append(err)
     else:
-        if sc not in (head, prev):
-            bad.append(f"git_commit {sc} ∉ {{HEAD {head}, HEAD~1 {prev or '-'}}}")
+        if sc not in allowed:
+            bad.append(f"git_commit {sc} ∉ {{{', '.join(allowed)}}} (HEAD, HEAD~1, merge parents and PR-head~1)")
         if not str(st.get("next_action", "")).strip():
             bad.append("next_action empty")
         if not parse_ts(str(st.get("last_updated", ""))):
@@ -182,7 +214,7 @@ def cmd_verify(root, staged: bool) -> int:
     prog = root / PROGRESS
     if not prog.exists() or not prog.read_text(encoding="utf-8", errors="replace").strip():
         bad.append(f"{PROGRESS} missing or empty")
-    print(f"state_gate verify: head={head} state={sc} staged={'yes' if staged else 'no'}")
+    print(f"state_gate verify: head={head} state={sc} staged={'yes' if staged else 'no'} merge={'yes' if len(allowed) > 2 else 'no'}")
     for b in bad:
         print(f"🔴 {b}")
     if bad:
@@ -223,7 +255,24 @@ def self_test() -> int:
     rc, out = cap(cmd_check, str(t)); ok &= rc == 0                                              # 10 well-formed turn
     t.write_text("```text\nprecheck t.md: 1 step(s), source=-, live=no\n✅ precheck: ok\nATTEST tool=precheck sha256=0 utc=x head=abcdef0 exit=0 cmd=x\n```\n", encoding="utf-8")
     rc, out = cap(cmd_check, str(t)); ok &= rc == 1 and "first tool block" in out                # 11 no open
-    print("✅ state_gate self-test ok (open/close/drift/--write/marker/verify/check: 11 cases)" if ok else "⛔ state_gate self-test FAILED")
+    # 12 R95: merge commit — state points at PR-head~1, must PASS; a stranger SHA must still FAIL
+    (d / PROGRESS).write_text("# progress\n- [ ] a\n- [x] b\n- [ ] c\n", encoding="utf-8", newline="\n")
+    G = ("-c", "user.email=t@t", "-c", "user.name=t")
+    base = git(d, "rev-parse", "HEAD")
+    git(d, "checkout", "-q", "-b", "feat")
+    git(d, *G, "commit", "-q", "--allow-empty", "-m", "f1"); f1 = git(d, "rev-parse", "--short=7", "HEAD")
+    git(d, *G, "commit", "-q", "--allow-empty", "-m", "f2")
+    git(d, "checkout", "-q", "-")
+    git(d, *G, "commit", "-q", "--allow-empty", "-m", "main-moves")
+    git(d, *G, "merge", "-q", "--no-ff", "-m", "Merge pull request", "feat")
+    (d / STATE).write_text(json.dumps({"turn_count": 9, "git_commit": f1, "next_action": "x", "last_updated": "2026-01-01T00:00:00Z"}), encoding="utf-8", newline="\n")
+    rc, out = cap(cmd_verify, d, False); ok &= rc == 0 and "merge=yes" in out                    # 12 PR-head~1 accepted on merge
+    (d / STATE).write_text(json.dumps({"turn_count": 9, "git_commit": base[:7], "next_action": "x", "last_updated": "2026-01-01T00:00:00Z"}), encoding="utf-8", newline="\n")
+    rc, out = cap(cmd_verify, d, False); ok &= rc == 1 and "∉" in out                            # 13 stranger SHA still refused
+    # 14 remaining=N counts only open boxes; close --write emits LF only
+    rc, out = cap(cmd_open, d, True); ok &= "remaining=2" in out
+    rc, out = cap(cmd_close, d, True, {"next": "n"}); ok &= rc == 0 and "remaining=2" in out and b"\r" not in (d / STATE).read_bytes()
+    print("✅ state_gate self-test ok (open/close/drift/--write/marker/verify/check/merge-aware/remaining/LF: 14 cases)" if ok else "⛔ state_gate self-test FAILED")
     return 0 if ok else 1
 
 
