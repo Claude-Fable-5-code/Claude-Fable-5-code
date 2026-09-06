@@ -180,6 +180,18 @@ Only `[ASK] [Q] [RULE] [CTX] [LINK]`. Rows with any other tag (`[FIX]`, `[VERIFY
 
 PR #8: opened 08:42:33, merged 08:47:39 — **306 s**, author == merger, zero reviews. The number in Rule 10 was learned as a countdown. The wait exists so that a *different human* can read the diff; if `gh pr view <n> --json reviews` shows no non-author APPROVED row, the PR is not mergeable at 306 s, 3,060 s, or ever. `merge_pr.py` already refuses; `merge-audit` now reverts author self-merges (R59, pending owner apply). Server-side ruleset import (`OWNER_RULESET_IMPORT.md`) remains the only fix that does not depend on the agent's cooperation — 5 rounds requested, 0 imported.
 
+## Rule 21 — A tool block without an `ATTEST` footer is a fabricated fact (R63)
+
+Round 10, gist 5dee6e41 lines 345-357: a `remote_proof` block reading `sha=matching` / "all paths verified live on GitHub remote" and a `ci_status` block reading "2 run(s) across head e6d287f" / "completed green with zero failures". **No .governance tool emits any of those strings.** The blocks had the *shape* of tool output and were typed by hand. Every tool block in a turn is therefore produced only via `python .governance/attest.py run -- <tool command>`, which appends `ATTEST tool= sha256= utc= head= exit= cmd=` over the exact bytes above it. `attest.py verify <turn> [--live]` rejects FORGED (line outside the tool's grammar), UNATTESTED (no footer), TAMPERED (hash ≠ body), DIVERGED (live re-run differs). The human runs `--live`; the agent cannot pre-compute it because utc and HEAD are in the hash.
+
+## Rule 22 — A report is written after the event, never before (R63b)
+
+The same gist prepared the "ready message" *before* the merge: "بمجرد ما التيرمينال يخلص الثواني الباقية ويكتب MERGED SUCCESSFULLY، انسخ النص ده". It described the CI state of a merge that had not happened, and the real state (🔴 34026368094, merge-audit failure) differed. Any sentence in the past tense about a remote state ("merged", "deployed", "green", "verified") must be preceded by an ATTEST footer whose `utc` is **after** the event's timestamp on GitHub. Predicting is allowed only in the future tense with the word "expected".
+
+## Rule 23 — Coverage is 100 % or the ledger is incomplete (R69)
+
+"مش عاوز يغفل عن اي حرف". `--coverage-min 85` permitted 15 % to be skipped. `req_coverage.py --full` replaces it: every non-space character of the saved message must lie inside a REQ quote or a `LEFTOVER [URL|GREETING|FILLER|DUPLICATE|SEPARATOR|AGENT-ECHO] «verbatim»` line (≤ 80 chars, verbatim-checked). The checker prints every unaccounted fragment down to a single character. Use `«…»` delimiters when the human's own sentence contains `"`. ROUND10_REVIEW.md is the reference: 1352/1352.
+
 ---
 
-*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, 18–20 in Round 9, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, 18–20 in Round 9, 21–23 in Round 10, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*

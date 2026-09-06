@@ -79,6 +79,15 @@ jobs:
         run: python .governance/merge_timing_guard.py --self-test
       - name: intent_gate self-test (Rule 19 — ask-before-act detector)
         run: python .governance/intent_gate.py --self-test
+      - name: attest must reject the Round-10 forged tool blocks (Rule 21)
+        run: |
+          if python .governance/attest.py verify docs/audit_reports/context-connect/context-connect/fixtures/forged_tool_block_round10.md; then echo "attest accepted forged blocks"; exit 1; fi
+      - name: req_coverage --full must pass ROUND10_REVIEW and fail with one REQ removed (Rule 23)
+        run: |
+          D=docs/audit_reports/context-connect/context-connect
+          python .governance/req_coverage.py $D/ROUND10_REVIEW.md --source $D/fixtures/human_msg_round10.txt --full
+          grep -v 'REQ-12 ' $D/ROUND10_REVIEW.md > /tmp/neg.md
+          if python .governance/req_coverage.py /tmp/neg.md --source $D/fixtures/human_msg_round10.txt --full; then echo "--full passed with a dropped REQ"; exit 1; fi
       - name: remote_proof must catch Round-8 phantom files (Rule 18)
         env: { GITHUB_TOKEN: "${{ github.token }}" }
         run: |

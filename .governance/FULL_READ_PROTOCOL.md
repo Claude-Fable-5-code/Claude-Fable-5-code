@@ -46,7 +46,7 @@ Rules for the ledger:
 
 ## Step 1b — Size does not matter; the ledger does
 
-"Small or large message, see all of it" — the mechanism is identical. A 3-word message produces a 1-row ledger. A 3,000-word message produces N rows and `req_coverage.py --coverage-min 85` prints every span ≥ 12 chars that no row quotes. The agent does not decide what is important; the checker decides what is missing.
+"Small or large message, see all of it" — the mechanism is identical. A 3-word message produces a 1-row ledger. A 3,000-word message produces N rows and `req_coverage.py --full` prints every fragment — down to one character — that no row or LEFTOVER line quotes (Round 10; `--coverage-min 85` is retired). The agent does not decide what is important; the checker decides what is missing.
 
 ## Step 2 — Work
 
@@ -66,7 +66,15 @@ UNMAPPED: none
 
 Allowed states: `DONE | ANSWERED | RULE-KEPT | CTX | BLOCKED | DEFERRED`. Nothing else. **Every REQ from Step 1 appears exactly once.** A REQ that appears in the ledger but not in the closure is a T1 violation — same weight as a failing CI gate.
 
-## Step 1b — Character coverage (Round 7, R47)
+## Step 1c — Splitting a long message is allowed; dropping any of it is not (Round 10, R69)
+
+"حتى لو قسمها لي مهام او تاسكات" — a long message may be split into many REQs across several turns, but the *union* of the quotes in the first ledger must still be the whole file: run `req_coverage.py --full` on the ledger before doing anything. Non-requirement text is declared, not ignored: `LEFTOVER [SEPARATOR] «""»`, `LEFTOVER [URL] «https://…»`, `LEFTOVER [AGENT-ECHO] «Sandbox reset مجددًا.»`. If the tool prints an unaccounted fragment, the ledger is redone — the agent never decides what was unimportant.
+
+## Step 0b — Every tool block goes through `attest.py run` (Round 10, R63)
+
+`ci_status`, `remote_proof`, `intent_gate`, `req_coverage`, `merge_pr` are never pasted directly. `python .governance/attest.py run -- python .governance/<tool> …` prints the output plus an `ATTEST` footer; the block is pasted with its footer. The human verifies with `attest.py verify <turn> --live`.
+
+## Step 1b — Character coverage (Round 7, R47; superseded by Step 1c in Round 10)
 
 `--source` proves every quote exists in the message. It does **not** prove the message was consumed: a ledger of 3 real quotes from a 20-sentence message passes `--source`. `--coverage-min P` closes that hole: the checker marks every non-space character of the message that lies inside some quote and fails if fewer than P % are marked, **printing the exact uncovered spans**. Floor for this project: **85 %**. Tags `[CTX]` exist precisely so filler sentences can be quoted without inventing a task for them.
 
