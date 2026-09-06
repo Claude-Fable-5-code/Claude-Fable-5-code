@@ -15,6 +15,9 @@ PLAN-ONLY: output ONLY (a) UNDERSTOOD: <verbatim quote of each sentence> (b) PLA
 (c) "Waiting for go." No tool calls beyond the gate itself. No "while waiting I also…".
 Triggers (from code, not memory): "قبل ما تنفذ قولي", "ها تعمل اي", "شوف كده نرفع اي", "اعرف هل هو فاهم",
 and the full list in intent_gate.py TRIGGERS. META means the human is quoting the rule, not invoking it.
+CONFIRM-FIRST (Round 12, Rule 27): "قبل ما تبحث … تتاكد انك فاهم … مش تخمن" or ≥2 ambiguity admissions →
+output ONLY a ```mirror block (UNDERSTOOD: verbatim quotes → your reading / QUESTION: / WAITING FOR: تمام).
+No plan, no tasks, no search. META framing does NOT neutralise CONFIRM-FIRST triggers.
 ```
 
 ---

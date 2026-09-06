@@ -77,6 +77,25 @@ jobs:
           grep -q "Rule 4" /tmp/r36
       - name: merge_timing_guard self-test (offline; must flag PR #3's real timestamps)
         run: python .governance/merge_timing_guard.py --self-test
+      - name: checker family self-tests (attest / claim_check / intent_gate / read_proof) — Round 12
+        run: |
+          set -e
+          python .governance/intent_gate.py --self-test
+          python .governance/claim_check.py --self-test
+          python .governance/read_proof.py --self-test
+          F=docs/audit_reports/context-connect/context-connect/fixtures
+          # R81: the Round-12 gist typed "✅ claim_check: prose consistent" under a turn with 16 contradictions → must FAIL with C7
+          if python .governance/claim_check.py $F/agent_gist_round12.md >/tmp/r81 2>&1; then echo "claim_check passed the Round-12 gist (R81 missed)"; exit 1; fi
+          grep -q "C7" /tmp/r81
+          # R83: the Round-12 human message is CONFIRM-FIRST and the agent's turn had no mirror block → must FAIL
+          python .governance/intent_gate.py detect $F/human_msg_round12.txt | grep -q "CONFIRM-FIRST"
+          if python .governance/intent_gate.py verify $F/agent_gist_round12.md --human $F/human_msg_round12.txt >/tmp/r83 2>&1; then echo "intent_gate passed a CONFIRM-FIRST turn without a mirror block (R83 missed)"; exit 1; fi
+          grep -q "mirror" /tmp/r83
+          # R84: a diagnosis with no read-proof block → must FAIL
+          printf 'The bug is in .governance/attest.py: blocks() skips the footer.\n' > /tmp/diag.md
+          if python .governance/read_proof.py check /tmp/diag.md; then echo "read_proof passed a diagnosis without a proof (R84 missed)"; exit 1; fi
+          # Round-10 forged block still rejected
+          if python .governance/attest.py verify $F/forged_tool_block_round10.md >/dev/null 2>&1; then echo "attest passed a forged block"; exit 1; fi
       - name: intent_gate self-test (Rule 19 — ask-before-act detector)
         run: python .governance/intent_gate.py --self-test
       - name: attest must reject the Round-10 forged tool blocks (Rule 21)

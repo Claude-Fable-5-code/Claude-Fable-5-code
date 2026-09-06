@@ -55,7 +55,11 @@ TOOLS = {  # header regex → (tool, allowed line regexes)
         r"^(ℹ️  |✅ |⛔ |⚠️  )?req_coverage:.*$", r"^  .*$", r"^UNCOVERED.*$",
     ],
     "merge_pr": [r"^PR #\d+ .*$", r"^  .*$", r"^(⛔|✅|ℹ️) .*$"],
-    "claim_check": [r"^🔴 C[1-6] .*$", r"^      ….*$", r"^(⛔|✅) claim_check: .*$"],
+    "claim_check": [r"^🔴 C[1-7] .*$", r"^      ….*$", r"^(⛔|✅) claim_check: .*$"],
+    "read_proof": [  # Round 12 (R84, Rule 28)
+        r"^read_proof \S+: \d+ lines sha256=[0-9a-f]{12}$", r"^  L\d+-L\d+  .*$",
+        r"^🔴 .*$", r"^(⛔|✅|ℹ️ ) ?read_proof: .*$",
+    ],
     "attest": [r"^.*$"],
 }
 FOOT = re.compile(r"^ATTEST tool=(\S+) sha256=([0-9a-f]{16}) utc=(\S+) head=([0-9a-f]{7}) exit=(-?\d+) cmd=(.*)$")

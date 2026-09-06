@@ -8,3 +8,8 @@ Then open a PR and **wait ≥ 5 min + 1 approval** before merging (Rule 10). PR 
 `cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml`
 One-line diff: `HEAD:main` → `HEAD:refs/heads/main` in the pre-push behavioural test. Without it `gate`
 is red on every `pull_request` event and the ruleset's required check `gate` will block every PR.
+
+## Round 12 — checker-family CI step (owner applies if the sandbox push to `.github/workflows` is rejected)
+`cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml`
+Adds the "checker family self-tests" step: self-tests for intent_gate / claim_check / read_proof plus three negatives
+from the real Round-12 gist (R81 typed verdict → C7, R83 CONFIRM-FIRST without mirror, R84 diagnosis without read_proof).

@@ -34,4 +34,5 @@ description: مهندس متخصص في تطبيق بروتوكول Vibe Coding 
 Splitting a long message into tasks is allowed. Dropping any of it is not (FULL_READ Step 1c).
 The union of all task quotes must equal the message file: req_coverage --full exit 0 over the whole turn,
 not per task. If a fragment fits no task, it goes in a LEFTOVER «…» line with a reason — never silently.
+Round 12: if intent_gate says CONFIRM-FIRST, do NOT split into tasks yet — mirror first, tasks after تمام (Rule 27).
 ```

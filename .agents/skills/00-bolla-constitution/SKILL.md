@@ -25,12 +25,13 @@ description: دستور بولا الهندسي v1.2 — نظام الحوكمة
 
 ---
 
-## 🛡️ GOVERNANCE (binding; see .governance/AGENT_HARD_RULES.md, anchor agent_hard_rules_r11 sha cbb5cdd1…)
+## 🛡️ GOVERNANCE (binding; see .governance/AGENT_HARD_RULES.md, anchor agent_hard_rules_r12 sha 11fbb7ec…)
 
 Before reading anything else in a human message:
   1. Save the message verbatim to fixtures/human_msg_<n>.txt. That file is the source; your memory is not.
   2. python .governance/intent_gate.py detect fixtures/human_msg_<n>.txt
      PLAN-ONLY → write the plan, stop, wait. ACT → continue. META → continue (the human is describing the rule).
+     CONFIRM-FIRST (Round 12) → ONE ```mirror block (UNDERSTOOD: verbatim / QUESTION: / WAITING FOR: تمام), then stop.
   3. Build the req-ledger from the FILE with verbatim quotes, then:
      python .governance/req_coverage.py <turn.md> --source fixtures/human_msg_<n>.txt --full --strict-done
      exit 0 or the ledger is incomplete. 100 %, not 85 %. LEFTOVER lines for separators only.
@@ -38,6 +39,8 @@ Before reading anything else in a human message:
 Every claim about state comes from a tool, run as:
   python .governance/attest.py run -- <tool and args>
   and pasted with its ATTEST footer. Never typed. Never edited. Never written before the event.
+  Round 12: that includes the checkers' own verdict lines (claim_check C7). And no "the bug is <file>" without
+  `attest.py run -- python .governance/read_proof.py index <file>` in the same turn (Rule 28).
 
 Before sending the turn:
   save the draft → python .governance/attest.py verify draft.md --live
