@@ -14,6 +14,10 @@ Reads an agent turn (file or stdin) containing a ```req-ledger``` block and a
   8. --source FILE   : every ledger quote must occur VERBATIM (whitespace-normalised)
                        in the human's original message. Catches paraphrase drift (R37:
                        agent wrote يشوعها, human wrote يشوفها).
+ 10. --coverage-min P : (needs --source) at least P% of the source's non-space characters must
+                       lie inside some ledger quote; prints every uncovered span >= 12 chars
+                       (R47: "every character" — quotes-in-source proves nothing was invented,
+                       coverage proves nothing was SKIPPED)
   9. --strict-done   : every DONE row must carry second-system proof: an https:// URL,
                        a CI run-id (8+ digits), or an 'origin/<ref>'. A bare commit hash
                        is NOT proof (it can exist only locally — R36: a84cbe0 was cited as
@@ -60,8 +64,15 @@ def main(argv: list[str]) -> int:
         i = argv.index("--source")
         if i + 1 >= len(argv):
             print("⛔ req_coverage: --source needs a file"); return 2
-        source_text = norm(Path(argv[i + 1]).read_text(encoding="utf-8", errors="replace"))
+        source_raw = Path(argv[i + 1]).read_text(encoding="utf-8", errors="replace")
+        source_text = norm(source_raw)
         args = [a for a in args if a != argv[i + 1]]
+    cov_min: float | None = None
+    if "--coverage-min" in argv:
+        j = argv.index("--coverage-min")
+        if j + 1 >= len(argv) or source_text is None:
+            print("⛔ req_coverage: --coverage-min needs a percentage and --source"); return 2
+        cov_min = float(argv[j + 1]); args = [a for a in args if a != argv[j + 1]]
     if not args:
         print(__doc__); return 2
     src = sys.stdin.read() if args[0] == "-" else Path(args[0]).read_text(encoding="utf-8", errors="replace")
@@ -126,6 +137,35 @@ def main(argv: list[str]) -> int:
             warnings.append(f"only {n_req} REQs for {n_sent} sentences (<60%) — ledger is probably short")
     else:
         problems.append("ledger lacks 'SENTENCES:' line")
+
+    if cov_min is not None and source_text is not None:
+        covered = bytearray(len(source_text))
+        for _, (_, quote) in ledger.items():
+            q = norm(quote)
+            if not q: continue
+            start = 0
+            while (k := source_text.find(q, start)) != -1:
+                covered[k:k + len(q)] = b"\x01" * len(q); start = k + 1
+        sig = [i for i, ch in enumerate(source_text) if not ch.isspace()]
+        hit = sum(1 for i in sig if covered[i])
+        pct = 100.0 * hit / max(1, len(sig))
+        # uncovered spans
+        spans, cur = [], None
+        for i, ch in enumerate(source_text):
+            if not covered[i] and not ch.isspace():
+                cur = [i, i] if cur is None else [cur[0], i]
+            elif ch.isspace() and cur is not None and i - cur[1] <= 1:
+                cur[1] = i
+            else:
+                if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
+                cur = None
+        if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
+        line = f"source coverage {pct:.0f}% of non-space chars inside ledger quotes (min {cov_min:.0f}%)"
+        if pct + 1e-9 < cov_min:
+            problems.append(line + f" — {len(spans)} uncovered span(s):")
+            problems.extend(f"    ⟪{sp[:90]}⟫" for sp in spans[:25])
+        else:
+            print(f"ℹ️  req_coverage: {line}")
 
     for w in warnings:
         print(f"⚠️  req_coverage: {w}")

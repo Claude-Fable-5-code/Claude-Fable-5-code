@@ -1,0 +1,25 @@
+From 25fc9d7de08a8e383e0d14484966d3f29e5aded2 Mon Sep 17 00:00:00 2001
+From: genspark_dev <genspark_dev@genspark.ai>
+Date: Sat, 5 Sep 2026 23:48:00 +0000
+Subject: [PATCH 2/8] =?UTF-8?q?docs(handoff):=20C0=20=E2=80=94=20no=20GitH?=
+ =?UTF-8?q?ub=20auth;=20export-per-chunk=20substitute?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../context-connect/context-connect/HANDOFF_ROUND7.md            | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+index c5da734..175e9a9 100644
+--- a/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
++++ b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+@@ -28,3 +28,4 @@ State on resume: sandbox reset; `main` = 9e0d0eb (PR #5 merged by owner). Fork r
+ - [ ] C6 PR
+ 
+ ## Export URLs
++- ⚠️ C0: `git push` → "could not read Username"; `gh auth status` → not logged in; no GH_TOKEN. **No GitHub auth in this sandbox at all** (worse than Round 6's read-only). Substitute: tar export + upload URL after every chunk (Rule 11b). Owner must push or re-authorize GitHub.
+-- 
+2.47.3
+

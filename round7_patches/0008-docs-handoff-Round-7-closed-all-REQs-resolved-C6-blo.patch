@@ -1,0 +1,62 @@
+From 4c054ae6b6ae1f872bcbb076e37386697291b7c9 Mon Sep 17 00:00:00 2001
+From: genspark_dev <genspark_dev@genspark.ai>
+Date: Sat, 5 Sep 2026 23:54:38 +0000
+Subject: [PATCH 8/8] =?UTF-8?q?docs(handoff):=20Round=207=20closed=20?=
+ =?UTF-8?q?=E2=80=94=20all=20REQs=20resolved;=20C6=20blocked=20on=20auth?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../context-connect/HANDOFF_ROUND7.md         | 30 ++++++++++++-------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+index ce8dc19..b72affb 100644
+--- a/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
++++ b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+@@ -4,18 +4,18 @@ State on resume: sandbox reset; `main` = 9e0d0eb (PR #5 merged by owner). Fork r
+ ## REQ ledger (from fixtures/human_msg_round7.txt — verbatim source)
+ | REQ | Your words (verbatim) | Status |
+ |---|---|---|
+-| REQ-1 | `شوف رابط كمان ده` (gist 5116f77…) | TODO |
+-| REQ-2 | `عاوز تشوف اصح مناسب ليه هو علشان مفيش حاجه تكرر تاني` | TODO |
+-| REQ-3 | `رايك و تقترحات و اعمل ملفات ان الزم عاوز كل حاجه كامله فعلي` | TODO |
+-| REQ-4 | `يشوف كلامي كامل بدون هلوسه و بدون ملخص او تمين … مش عاوز يغفل عن اي حرف مش كلمه ولا سطر` | TODO |
+-| REQ-5 | `هل رجعلك كل حاجه ولا ف حجات ناقصه بتقع منه ؟؟؟` | TODO |
+-| REQ-6 | `وامعل ملفات برضو علشان نرفعه ع جيت هاب` | TODO |
+-| REQ-7 | `راجع كل حاجه فص فص` (repo main) | TODO |
++| REQ-1 | `شوف رابط كمان ده` (gist 5116f77…) | DONE — gist read fully, fixtures/gist_5116f77_round7.txt; R41–R46 |
++| REQ-2 | `عاوز تشوف اصح مناسب ليه هو علشان مفيش حاجه تكرر تاني` | ANSWERED — ROUND7_REVIEW §2/§7: status hallucination, not content; ruleset import is the fix |
++| REQ-3 | `رايك و تقترحات و اعمل ملفات ان الزم عاوز كل حاجه كامله فعلي` | DONE — 9 files (see review §7); real, tested, exit 0 |
++| REQ-4 | `يشوف كلامي كامل بدون هلوسه و بدون ملخص او تمين … مش عاوز يغفل عن اي حرف مش كلمه ولا سطر` | ANSWERED+DONE — --coverage-min 85 shipped; review §4 |
++| REQ-5 | `هل رجعلك كل حاجه ولا ف حجات ناقصه بتقع منه ؟؟؟` | ANSWERED — review §1: work lands, honest state drops (R41–R43) |
++| REQ-6 | `وامعل ملفات برضو علشان نرفعه ع جيت هاب` | DONE — commits on genspark_ai_developer; patch series in bundle (no auth to push) |
++| REQ-7 | `راجع كل حاجه فص فص` (repo main) | DONE — main @ 9e0d0eb reviewed: workflow real, PR #5 3 s/red |
+ | REQ-8 | `حدث ملفات فورا لحظي عشان جلسه بتوقف ف اي وقت` | RULE (in force) |
+-| REQ-9 | `بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟` | TODO |
+-| REQ-10 | `نفذ كام ف %؟؟ نسبه؟` | TODO |
+-| REQ-11 | `تقترح من جلسات … مفيش مخرج نهائيه؟؟` | TODO |
+-| REQ-12 | `بينسي بعد 5 دقيقه و الحل اي بقي` | TODO |
++| REQ-9 | `بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟` | ANSWERED — review §2 (5 shapes) |
++| REQ-10 | `نفذ كام ف %؟؟ نسبه؟` | ANSWERED — review §3: 40% (4/10 discipline items) |
++| REQ-11 | `تقترح من جلسات … مفيش مخرج نهائيه؟؟` | ANSWERED — review §5 |
++| REQ-12 | `بينسي بعد 5 دقيقه و الحل اي بقي` | ANSWERED — review §6: re-reading not memory; export per chunk |
+ | REQ-13 | `اوعي تنسي ده … push-per-chunk` | RULE (in force) |
+ 
+ ## Chunks
+@@ -44,3 +44,11 @@ Workflow on main IS the Round-6 one (merge-audit + strict-done + source) — tha
+ - [x] C0 → https://www.genspark.ai/api/files/s/Egs0jMcL
+ - [x] C1 gist saved `fixtures/gist_5116f77_round7.txt`; claims cross-checked above
+ - [x] C2 repo main @ 9e0d0eb reviewed (workflow real; PR #5 red on PR-event; merge-audit fired & failed)
++
++- [x] C3 --coverage-min (R47) + protocol Step 1b + example 22 REQs → https://www.genspark.ai/api/files/s/Tgzy7Zjb
++- [x] C4 merge_pr.py + Rules 12–15
++- [x] C5 ROUND7_REVIEW.md
++- [~] C6 PR: **BLOCKED — zero GitHub auth in this sandbox.** Owner applies: `git am round7_patches/*.patch` (in final bundle) on `genspark_ai_developer`, push, open PR, wait ≥5 min, get 1 approval, then `python .governance/merge_pr.py <n>`.
++
++## Local gate at end of round (all rc=0)
++secret_scan clean · path_scan clean · verify_sync PARITY · probe 9/9 · req_coverage 22 REQs (96% coverage) · merge_timing_guard self-test ok · negatives fail as expected (rc=1 ×2)
+-- 
+2.47.3
+

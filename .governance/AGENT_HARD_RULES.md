@@ -133,10 +133,33 @@
 [ ] git push origin <branch> succeeded WITHOUT touching credentials
 [ ] Actions run link recorded (or "awaiting CI" written — never "100%")
 [ ] PR opened/updated; main untouched (Rule 7)
-[ ] req-closure block + req_coverage.py exit 0 (Rule 9)
+[ ] req-closure block + req_coverage.py --strict-done --source --coverage-min 85 exit 0 (Rules 9, 14)
+[ ] ALL run ids for the head sha listed with conclusions; none 'failure' (Rule 12)
+[ ] merge (if any) went through merge_pr.py; output pasted (Rule 13)
 [ ] Self-critique lists EVERY command that touched auth, main, or files outside the repo (R27)
 ```
 
+## Rule 12 — CI is red if ANY run on the change is red (R42/R43, Round 7)
+
+PR #5 had three runs: `push` on main → green; `pull_request` gate → **red**; `pull_request` merge-audit → **red**. The agent cited the green one and wrote "100% green". Forbidden. Before claiming CI status:
+
+```
+gh run list --commit <sha> --json databaseId,event,conclusion    # every event, not one
+```
+Report **all** run ids with their conclusions. One `failure` = "CI RED". `skipped` ≠ `success`. `merge-audit skipped` means it did not run, not that it passed.
+
+## Rule 13 — Merging goes through `merge_pr.py` only (R46)
+
+`push_to_github.py` (or any helper) never calls the merge endpoint directly. It calls `python .governance/merge_pr.py <n>`, which refuses when age < 300 s, approvals from non-authors < 1, or any check is not green. PR #3 (4 s) and PR #5 (3 s) would both have been refused. Server-side ruleset remains the real fix; this is the fence until the owner imports it.
+
+## Rule 14 — Quotes are copied, never typed (R37/R47)
+
+The human message is saved byte-for-byte to `docs/…/fixtures/human_msg_<round>.txt` **before** the ledger. Every ledger quote is copy-pasted from that file. `req_coverage.py … --source <file> --coverage-min 85` must exit 0. Round 7: the consultant typed a quote from memory that came from a *different* message; the checker caught it. Memory is not a source.
+
+## Rule 15 — "Approved" means a review row exists (R41)
+
+`merged` ≠ `approved`. Say "approved" only if `gh pr view <n> --json reviews` shows a review with state `APPROVED` from someone other than the author. PR #4 was merged by the owner with 0 review rows: correct word is "merged by owner without review".
+
 ---
 
-*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*

@@ -2,7 +2,7 @@
 
 ```req-ledger
 SOURCE: https://gist.github.com/pijsal1-tech/9c72… … push-per-chunk لمقاومة الـresets
-SENTENCES: 13
+SENTENCES: 22
 REQ-01 [LINK]  "https://gist.github.com/pijsal1-tech/9c728a8267a855a080a200dfc676f800 شوف رابط كمان ده"  → read the gist in full; report contents
 REQ-02 [ASK]   "لسه مش كالم برضو عاوز تشوف اصح مناسب ليه"                                            → still not complete; find what is truly right for him
 REQ-03 [ASK]   "علشان مفيش حاجه تكرر تاني"                                                              → goal: nothing recurs again → prevention must be mechanical
@@ -17,8 +17,15 @@ REQ-11 [ASK]   "وامعل ملفات برضو علشان نرفعه ع جيت �
 REQ-12 [LINK]  "https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/tree/main"                  → inspect the live repo
 REQ-13 [ASK]   "مش عاوزك تسيب حاجه راجع كل حاجه فص فص كل حاجه و كل حاجه تحلص حدث ملفات فورا لحظي"     → review everything piece by piece; update files immediately as each finishes
 REQ-14 [RULE]  "عشان جلسه  بتوقف  ف اي وقت"                                                             → session can stop any time → commit per chunk
+REQ-16 [CTX]   "و صحيح مهم جدا جدا ليا كمان اني"                                                          → emphasis marker for REQ-06
+REQ-17 [CTX]   "او تاسكات المهم عندي"                                                                      → tail of REQ-08 (tasks = تاسكات)
+REQ-18 [RULE]  "مهم جدا جدا انه يشوف و يقراء كل حرف و كل كلمه و كل سطر"                                    → restated: read every char/word/line
+REQ-19 [Q]     "صحيح كمان هل هو لحد الان اكتشفته بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟"                    → WHERE exactly does it hallucinate, so we can constrain it more
+REQ-20 [Q]     "وكمان هل نفذ كام ف %؟؟ نسبه؟"                                                             → what percentage has it executed
+REQ-21 [Q]     "وكمان رايك و تقترح من جلسات هل نعمل معاه اي علشان نحكومه كويس جيدا جدا جدا يكون مفيش مخرج نهائيه؟؟" → session-level proposal so there is no escape
+REQ-22 [ASK]   "(push-per-chunk لمقاومة الـresets): مجلد شوف انت مكناهم مناسب فين بقي"                   → choose the right folder for the files
 REQ-15 [RULE]  "اوعي تنسي ده Sandbox reset مجددًا. أستعيد وأجمّد الخطة فورًا ثم أنفّذ بchunks صغيرة مدفوعة" → on reset: restore, freeze plan first, push-per-chunk
-COVERAGE: 15 REQs from 13 sentences — none
+COVERAGE: 22 REQs from 22 sentences — none
 ```
 
 … (work) …
@@ -39,5 +46,12 @@ REQ-12 DONE      live origin/main=46d524c inspected via https://api.github.com/r
 REQ-13 RULE-KEPT each chunk committed immediately (7 commits); handoff written before analysis
 REQ-14 RULE-KEPT HANDOFF_ROUND5.md written first; commit after every file
 REQ-15 RULE-KEPT sandbox state checked first (no reset this time); plan frozen in HANDOFF_ROUND5.md before work
+REQ-16 CTX       —
+REQ-17 CTX       —
+REQ-18 RULE-KEPT ledger built from the verbatim message file; --coverage-min enforced
+REQ-19 ANSWERED  ROUND5_REVIEW §7 / ROUND6_REVIEW §1 — state reports, not content
+REQ-20 ANSWERED  ROUND6_REVIEW §2 — 77% (27/35)
+REQ-21 ANSWERED  ROUND6_REVIEW §3 — session rules
+REQ-22 DONE      docs/audit_reports/context-connect/context-connect/ on origin/genspark_ai_developer
 UNMAPPED: none
 ```
