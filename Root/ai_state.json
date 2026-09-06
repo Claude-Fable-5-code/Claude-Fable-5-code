@@ -1,10 +1,10 @@
 {
   "mode": "[ACT]",
-  "current_tag": "[ROUND14-C7]",
-  "turn_count": 306,
-  "git_commit": "463a967",
-  "last_action": "C7: Round 14 squashed into one commit (C0-C6c). Rules 35-37 (R90-R94): state_gate.py, mistakes recurrence + 33-ESC, edit_proof --scope, mock_scan.py in hook+CI, guide corrected, 7 skills, review --full 555/555, handoff.",
-  "next_action": "Owner: apply latest archive (git am), push -f genspark_ai_developer, open PR, wait CI + 300s floor, merge manually. Next session: state_gate open first; read MISTAKES.md; Round 15 preflight audit of whatever CI reveals.",
+  "current_tag": "[ROUND14-C7-url]",
+  "turn_count": 307,
+  "git_commit": "3e839a1",
+  "last_action": "C7 URL row after reset #3: 3e839a1 restored from bundle mc7zSGK9; plan C7 ticked with SHA+URL; PROGRESS + HANDOFF chunk tables completed. Nothing pushed yet.",
+  "next_action": "Owner: download final archive (2 commits), git fetch bundle / git am, push -f genspark_ai_developer, open PR, CI + 300s floor, manual merge. Next session: state_gate open FIRST; cat MISTAKES.md; Round 15 = preflight audit of CI results.",
   "last_message_summary": "استلام تقرير وحزمة Round 10 من الاستشاري، شرح اكتشافات الجولة 10 (الكتل المصطنعة وحلها بـ attest)، وتثبيت المرساة r10 بنجاح.",
-  "last_updated": "2026-09-06T17:55:08Z"
+  "last_updated": "2026-09-06T17:57:29Z"
 }

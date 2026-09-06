@@ -61,7 +61,7 @@ Each chunk = `git commit` → `sh .governance/export_bundle.sh` → upload → p
 - [x] **C6** — split: C6a (guide) commit ba74cc2 · URL: https://www.genspark.ai/api/files/s/y4X9hU7M ; C6b (rules/protocol/skills/plan) commit f4a6361 · URL: https://www.genspark.ai/api/files/s/SqJJGyeF ; C6c (review + handoff) _this commit_ — Guide corrections (§1 PID kill, §2 command + rule numbers, §3 real sub‑commands, §6 no auto‑merge,
       §8 table, §9 now points at state_gate) ; `AGENT_HARD_RULES.md` Rules 35‑37 ; `FULL_READ_PROTOCOL.md`
       steps ; 7 skills bumped ; `ROUND14_REVIEW.md` (`req_coverage --full`) ; `HANDOFF_ROUND14.md`.
-- [ ] **C7** — squash to one commit + final export URL. Owner pushes `-f` + opens PR. No self‑merge.
+- [x] **C7** — squashed to one commit 3e839a1 · URL: https://www.genspark.ai/api/files/s/mc7zSGK9 (C6c pre‑squash archive: https://www.genspark.ai/api/files/s/8q8Vr7DK). Reset #3 hit right after; 3e839a1 was restored bit‑exact from this bundle. This URL row is the one extra commit the plan allows; its own archive is the FINAL one (HANDOFF_ROUND14.md). Owner pushes `-f` + opens PR. No self‑merge.
 
 ## Turn contract
 - Every fact = tool block with ATTEST footer (Rule 21). No typed verdicts (Rule 29).

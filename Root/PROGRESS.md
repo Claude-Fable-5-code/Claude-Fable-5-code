@@ -28,4 +28,5 @@
 - C5b mock_scan.py in hook + CI (R93) — commit 75463b2 — https://www.genspark.ai/api/files/s/kaEAS4ip
 - C6a guide corrected (R90-R94) — commit ba74cc2 — https://www.genspark.ai/api/files/s/y4X9hU7M
 - C6b Rules 35-37 + protocol steps 0d/2e/2f + 7 skills + plan ticks — commit f4a6361 — https://www.genspark.ai/api/files/s/SqJJGyeF
-- C6c ROUND14_REVIEW.md (--full 555/555) + HANDOFF_ROUND14.md — _this commit_
+- C6c ROUND14_REVIEW.md (--full 555/555) + HANDOFF_ROUND14.md — 124dc83 — https://www.genspark.ai/api/files/s/8q8Vr7DK
+- C7 squash → 3e839a1 — https://www.genspark.ai/api/files/s/mc7zSGK9 (reset #3 recovered from this bundle) ; final URL‑row commit — see HANDOFF_ROUND14.md

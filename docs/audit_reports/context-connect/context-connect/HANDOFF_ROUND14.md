@@ -18,8 +18,9 @@ R90 state file promised, never read → `state_gate.py` · R91 same rule broken 
 | C5b mock_scan.py + hook + grammar + CI R93 | 75463b2 | https://www.genspark.ai/api/files/s/kaEAS4ip |
 | C6a USER_COMPLETE_OPERATING_GUIDE.md corrected | ba74cc2 | https://www.genspark.ai/api/files/s/y4X9hU7M |
 | C6b Rules 35–37, protocol steps, 7 skills, plan ticks | f4a6361 | https://www.genspark.ai/api/files/s/SqJJGyeF |
-| C6c this handoff + ROUND14_REVIEW.md (--full 555/555) | _see PLAN_ROUND14.md_ | _see PLAN_ROUND14.md_ |
-| C7 squash → one commit | _see PLAN_ROUND14.md_ | _see PLAN_ROUND14.md_ |
+| C6c this handoff + ROUND14_REVIEW.md (--full 555/555) | 124dc83 | https://www.genspark.ai/api/files/s/8q8Vr7DK |
+| C7 squash → one commit (tree identical to C6c except ai_state.json) | 3e839a1 | https://www.genspark.ai/api/files/s/mc7zSGK9 |
+| C7+ URL row (**apply THIS archive: 2 commits = squash + this row**) | _HEAD_ | _pasted in the chat turn that delivered it_ |
 
 ## Owner steps (on your machine; token goes into the credential manager, never into chat)
 ```bash
