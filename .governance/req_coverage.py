@@ -16,6 +16,11 @@ Reads an agent turn (file or stdin) containing a ```req-ledger``` block and a
                        agent wrote يشوعها, human wrote يشوفها).
  10. --coverage-min P : (needs --source) at least P% of the source's non-space characters must
                        lie inside some ledger quote; prints every uncovered span >= 12 chars
+ 11. --full           : (R69, Round 10; needs --source) EVERY non-space character must lie inside a
+                       REQ quote OR a LEFTOVER line: `LEFTOVER [URL|GREETING|FILLER|DUPLICATE|SEPARATOR|AGENT-ECHO] "verbatim span"`.
+                       Percentages permit skipping; --full permits nothing unaccounted. This is the
+                       mechanical form of "يشوف كل حرف": the source file is the memory, and the ledger
+                       must partition it — there is no 'rest'.
                        (R47: "every character" — quotes-in-source proves nothing was invented,
                        coverage proves nothing was SKIPPED)
   9. --strict-done   : every DONE row must carry second-system proof: an https:// URL,
@@ -40,9 +45,11 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 ALLOWED = {"DONE", "ANSWERED", "RULE-KEPT", "CTX", "BLOCKED", "DEFERRED"}
+LEFTOVER_ROW = re.compile(r'^\s*LEFTOVER\s+\[(URL|GREETING|FILLER|DUPLICATE|SEPARATOR|AGENT-ECHO)\]\s+(?:"(.*?)"|«(.*?)»)\s*$', re.M)
 LEDGER_RX = re.compile(r"```req-ledger\s*\n(.*?)```", re.S)
 CLOSURE_RX = re.compile(r"```req-closure\s*\n(.*?)```", re.S)
-LEDGER_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[(ASK|Q|RULE|CTX|LINK)\]\s+\"(.+?)\"", re.M)
+# Quote delimiters: "…" OR «…» (R70: use « » when the human's sentence itself contains " so it is not truncated)
+LEDGER_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[(ASK|Q|RULE|CTX|LINK)\]\s+(?:\"(.+?)\"|«(.+?)»)\s*(?:→|->|$)", re.M)
 ANY_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[([A-Z-]+)\]", re.M)
 CLOSURE_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+([A-Z-]+)\b(.*)$", re.M)
 SENT_RX = re.compile(r"^\s*SENTENCES:\s*(\d+)", re.M)
@@ -74,6 +81,10 @@ def main(argv: list[str]) -> int:
         if j + 1 >= len(argv) or source_text is None:
             print("⛔ req_coverage: --coverage-min needs a percentage and --source"); return 2
         cov_min = float(argv[j + 1]); args = [a for a in args if a != argv[j + 1]]
+    full = "--full" in argv
+    if full and source_text is None:
+        print("⛔ req_coverage: --full needs --source"); return 2
+    if full: cov_min = 100.0
     if not args:
         print(__doc__); return 2
     src = sys.stdin.read() if args[0] == "-" else Path(args[0]).read_text(encoding="utf-8", errors="replace")
@@ -85,7 +96,7 @@ def main(argv: list[str]) -> int:
         print("⛔ req_coverage: no ```req-closure``` block found (Step 3 skipped)"); return 2
 
     problems: list[str] = []
-    ledger = {m.group(1): (m.group(2), m.group(3)) for m in LEDGER_ROW.finditer(lm.group(1))}
+    ledger = {m.group(1): (m.group(2), m.group(3) if m.group(3) is not None else m.group(4)) for m in LEDGER_ROW.finditer(lm.group(1))}
     # R49: a row that LOOKS like a REQ but uses an unknown tag ([FIX] [VERIFY] [REPORT] …) was silently
     # skipped — so it inflated the REQ count in prose while escaping every check. Now it is a violation.
     for m in ANY_ROW.finditer(lm.group(1)):
@@ -152,7 +163,14 @@ def main(argv: list[str]) -> int:
 
     if cov_min is not None and source_text is not None:
         covered = bytearray(len(source_text))
-        for _, (_, quote) in ledger.items():
+        leftovers = [(m.group(1), m.group(2) if m.group(2) is not None else m.group(3)) for m in LEFTOVER_ROW.finditer(lm.group(1))]
+        for tag, span in leftovers:
+            if norm(span) not in source_text:
+                problems.append(f"LEFTOVER [{tag}] is NOT verbatim in --source: \"{span[:60]}\"")
+            if tag != "URL" and len(norm(span).replace(" ", "")) > 80:
+                problems.append(f"LEFTOVER [{tag}] span too long ({len(span)} chars) — that is a requirement, not a leftover: \"{span[:50]}\"")
+        quotes = [q for _, (_, q) in ledger.items()] + [sp for _, sp in leftovers]
+        for quote in quotes:
             q = norm(quote)
             if not q: continue
             start = 0
@@ -172,7 +190,24 @@ def main(argv: list[str]) -> int:
                 if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
                 cur = None
         if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
-        line = f"source coverage {pct:.0f}% of non-space chars inside ledger quotes (min {cov_min:.0f}%)"
+        if full:
+            line = f"FULL coverage: {hit}/{len(sig)} non-space chars accounted for ({len(ledger)} REQ quotes + {len(leftovers)} LEFTOVER spans)"
+            if hit < len(sig):
+                problems.append(f"--full: {len(sig)-hit} source chars in NO quote and NO LEFTOVER line — unread or silently dropped (R69)")
+                for sp in spans or []: problems.append(f"   unaccounted: \"{sp[:100]}\"")
+                # also short spans (<12) that the >=12 filter hides
+                short = []
+                i = 0
+                while i < len(source_text):
+                    if not covered[i] and not source_text[i].isspace():
+                        j = i
+                        while j < len(source_text) and not covered[j] and not source_text[j].isspace(): j += 1
+                        if j - i < 12: short.append(source_text[i:j])
+                        i = j
+                    else: i += 1
+                if short: problems.append(f"   unaccounted short fragments: {short[:15]}")
+        else:
+            line = f"source coverage {pct:.0f}% of non-space chars inside ledger quotes (min {cov_min:.0f}%)"
         if pct + 1e-9 < cov_min:
             problems.append(line + f" — {len(spans)} uncovered span(s):")
             problems.extend(f"    ⟪{sp[:90]}⟫" for sp in spans[:25])
