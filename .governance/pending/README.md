@@ -3,3 +3,8 @@ Round 7: `governance-gate.yml` adds `--coverage-min 85` (R47) to both req_covera
 Apply:
     cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml && git add -A && git commit -m "ci: R47 coverage-min" 
 Then open a PR and **wait ≥ 5 min + 1 approval** before merging (Rule 10). PR #5 was merged in 3 s and `merge-audit` went RED — do not repeat.
+
+## Round 8 — R52 fix (owner applies; sandbox token lacks `workflows` scope)
+`cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml`
+One-line diff: `HEAD:main` → `HEAD:refs/heads/main` in the pre-push behavioural test. Without it `gate`
+is red on every `pull_request` event and the ruleset's required check `gate` will block every PR.

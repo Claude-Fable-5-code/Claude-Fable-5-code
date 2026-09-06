@@ -54,6 +54,10 @@ def main(argv: list[str]) -> int:
     approvals = {r["user"]["login"] for r in reviews if r["state"] == "APPROVED" and r["user"]["login"] != pr["user"]["login"]}
     checks = gh(f"/commits/{pr['head']['sha']}/check-runs").get("check_runs", [])
     not_green = [c["name"] for c in checks if c.get("conclusion") != "success"]
+    # R50: also look at WORKFLOW RUNS for the head sha (all events). PR #6 had 2 red pull_request
+    # runs and 2 green push runs; check-runs alone can be cherry-picked by event. Rule 12.
+    wruns = gh(f"/actions/runs?head_sha={pr['head']['sha']}&per_page=100").get("workflow_runs", [])
+    red_runs = [f"{w['id']}:{w['event']}:{w.get('conclusion') or w['status']}" for w in wruns if w.get("conclusion") != "success"]
 
     problems = []
     if age < min_age: problems.append(f"PR age {age:.0f}s < {min_age}s (R38: PR #3 = 4 s, PR #5 = 3 s)")
@@ -61,6 +65,7 @@ def main(argv: list[str]) -> int:
     if me and pr["user"]["login"] == me and not approvals: problems.append(f"self-merge by author '{me}' with zero external reviews")
     if not checks: problems.append("no check-runs on head SHA yet — CI has not even started")
     if not_green: problems.append(f"checks not green: {not_green}")
+    if red_runs: problems.append(f"workflow runs not green (all events, Rule 12): {red_runs}")
 
     print(f"PR #{n} '{pr['title'][:60]}' age={age:.0f}s approvals={sorted(approvals)} checks={len(checks)} not_green={len(not_green)}")
     if problems:
