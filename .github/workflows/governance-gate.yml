@@ -79,6 +79,25 @@ jobs:
           if python .governance/read_proof.py check /tmp/diag.md; then echo "read_proof passed a diagnosis without a proof (R84 missed)"; exit 1; fi
           # Round-10 forged block still rejected
           if python .governance/attest.py verify $F/forged_tool_block_round10.md >/dev/null 2>&1; then echo "attest passed a forged block"; exit 1; fi
+      - name: checker family self-tests (mistakes / edit_proof / self_review / precheck) — Round 13
+        run: |
+          set -e
+          python .governance/mistakes.py --self-test
+          python .governance/edit_proof.py --self-test
+          python .governance/self_review.py --self-test
+          python .governance/precheck.py --self-test
+          # R85: admission with no ledger row → must FAIL
+          printf 'I was wrong about the export step; I forgot it entirely and typed the verdict.\n' > /tmp/r85.md
+          if python .governance/mistakes.py check /tmp/r85.md; then echo "mistakes passed an unrecorded admission (R85 missed)"; exit 1; fi
+          # R86: edit claim with no edit_proof block → must FAIL
+          printf 'I fixed .governance/attest.py so the grammar accepts precheck.\n' > /tmp/r86.md
+          if python .governance/edit_proof.py check /tmp/r86.md; then echo "edit_proof passed an unproven edit claim (R86 missed)"; exit 1; fi
+          # R87: all-✅ self-review with no remote proof → must FAIL
+          printf '```self-review\nQ1 attested:   ✅  evidence: sha256=0000000000000000\nQ2 prechecked: ✅  evidence: sha256=0000000000000000\nQ3 skipped:    none\nQ4 pleasing:   none\nQ5 re-read:    ✅  missed: none missed\nQ6 remote:     ✅  evidence: pushed\n```\n' > /tmp/r87.md
+          if python .governance/self_review.py check /tmp/r87.md; then echo "self_review passed an all-✅ block with no evidence (R87 missed)"; exit 1; fi
+          # R88: a turn with no tool blocks must be stopped by precheck at attest
+          printf 'Done, pushed, green.\n' > /tmp/r88.md; printf 'x\n' > /tmp/r88h.txt
+          if python .governance/precheck.py /tmp/r88.md --source /tmp/r88h.txt; then echo "precheck passed an empty turn (R88 missed)"; exit 1; fi
       - name: pre-push hook behavioural test (must block main + inline credential helper, allow feature branch)
         run: |
           set -e

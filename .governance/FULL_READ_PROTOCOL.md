@@ -138,12 +138,48 @@ No "the bug is / السبب / الخطأ في" about a file that has no live `re
 
 ---
 
+## Step 0c — Plan file first, export after every chunk (Round 13, R89, Rule 33)
+```
+# before any tool work:   docs/…/PLAN_ROUND<N>.md with the frozen chunk list, then commit
+# after every chunk:      git commit && sh .governance/export_bundle.sh   → upload → URL into the plan (next commit)
+```
+No URL, no tick. `setup_github_environment` first; if no token, do not try `git push` — export.
+
+## Step 2c — Edit claims carry a diff (Round 13, R86, Rule 31)
+```
+python .governance/attest.py run -- python .governance/edit_proof.py show <path> [<path>…]    # paste the block
+```
+"عدّلت / fixed / edited <file>" without an `edit_proof` block for that file (state ≠ UNCHANGED, sha = disk) fails `edit_proof.py check`.
+
+## Step 2d — Admissions are recorded (Round 13, R85, Rule 30)
+```
+python .governance/attest.py run -- python .governance/mistakes.py record --round <N> --rule <R> "<one line>"
+```
+Then the prose may say "I was wrong". `mistakes.py check <turn>` fails an admission with no row.
+
+## Step 4d — Self-review with six questions (Round 13, R87, Rule 32)
+```self-review
+Q1 attested:   ✅/❌  evidence: sha256=<footer sha of a block in this turn>
+Q2 prechecked: ✅/❌  evidence: sha256=<footer sha of the precheck block>
+Q3 skipped:    <check name + why>  | none          (none only with ≥ 3 tool families in the turn)
+Q4 pleasing:   «<verbatim sentence from this turn's prose>» | none
+Q5 re-read:    ✅/❌  missed: «<verbatim from the human message>» | none missed
+Q6 remote:     ✅/❌  evidence: <remote_proof REMOTE> | none — <why>
+```
+
+## Step 5 — Precheck, then send (Round 13, R88, Rule 34)
+```
+python .governance/attest.py run -- python .governance/precheck.py <turn.md> --source <human.txt>   # paste table; its sha → Q2
+```
+Stops at the first red step. Fix, re-run, paste the green table. Only then send.
+
 ## Session-start addendum (added to AGENT_HARD_RULES checklist)
 
 ```
 [ ] First output of the first turn is a req-ledger block. No tool call precedes it.
 [ ] Last output of every turn is a req-closure block + req_coverage.py exit code.
 [ ] Round 12: intent_gate detect ran on the human message; CONFIRM-FIRST → mirror block only. No cause named without a read_proof block. No verdict line typed.
+[ ] Round 13: PLAN_ROUND<N>.md committed before any tool work; MISTAKES.md read; every chunk row has an export URL; precheck table pasted before sending; self-review has a ❌ or a REMOTE proof.
 ```
 
 ## Known limits (stated so nobody over-trusts this)

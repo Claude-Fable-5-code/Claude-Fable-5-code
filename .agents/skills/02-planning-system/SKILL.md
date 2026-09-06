@@ -16,6 +16,7 @@ PLAN-ONLY: output ONLY (a) UNDERSTOOD: <verbatim quote of each sentence> (b) PLA
 Triggers (from code, not memory): "قبل ما تنفذ قولي", "ها تعمل اي", "شوف كده نرفع اي", "اعرف هل هو فاهم",
 and the full list in intent_gate.py TRIGGERS. META means the human is quoting the rule, not invoking it.
 CONFIRM-FIRST (Round 12, Rule 27): "قبل ما تبحث … تتاكد انك فاهم … مش تخمن" or ≥2 ambiguity admissions →
+Round 13 (R85-R89 — Rules 30-34): (a) PLAN_ROUND<N>.md is the FIRST commit; every chunk = commit + `export_bundle.sh` + upload, URL into the plan — no URL, no tick; if `setup_github_environment` has no token, export immediately, do not try `git push`. (b) "I was wrong / غلطت" needs a `mistakes.py record` row in MISTAKES.md. (c) "edited / عدّلت <file>" needs an `attest run -- edit_proof.py show <file>` block (not UNCHANGED). (d) The self-review is six fixed questions (`self_review.py`); all-✅ with no REMOTE proof fails. (e) `attest run -- precheck.py <turn> --source <human>` is pasted before sending; its sha is Q2.
 output ONLY a ```mirror block (UNDERSTOOD: verbatim quotes → your reading / QUESTION: / WAITING FOR: تمام).
 No plan, no tasks, no search. META framing does NOT neutralise CONFIRM-FIRST triggers.
 ```
