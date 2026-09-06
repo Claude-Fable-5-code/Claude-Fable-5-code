@@ -49,7 +49,8 @@ def sha12(p: pathlib.Path) -> str:
 
 
 def git(*a) -> str:
-    return subprocess.run(["git", *a], capture_output=True, text=True, cwd=ROOT).stdout.strip()
+    p = subprocess.run(["git", *a], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
+    return (p.stdout or "").strip()
 
 
 def show_one(path: str):

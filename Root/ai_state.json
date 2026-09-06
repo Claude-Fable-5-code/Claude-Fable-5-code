@@ -1,10 +1,10 @@
 {
   "mode": "[ACT]",
-  "current_tag": "[ROUND14-C7-url]",
-  "turn_count": 307,
-  "git_commit": "3e839a1",
-  "last_action": "C7 URL row after reset #3: 3e839a1 restored from bundle mc7zSGK9; plan C7 ticked with SHA+URL; PROGRESS + HANDOFF chunk tables completed. Nothing pushed yet.",
-  "next_action": "Owner: download final archive (2 commits), git fetch bundle / git am, push -f genspark_ai_developer, open PR, CI + 300s floor, manual merge. Next session: state_gate open FIRST; cat MISTAKES.md; Round 15 = preflight audit of CI results.",
+  "current_tag": "[ROUND14-PARITY-FIX]",
+  "turn_count": 308,
+  "git_commit": "3e1fc30",
+  "last_action": "Sync proposed_files/.gitignore parity with root .gitignore to satisfy parity gate (verify_sync.py)",
+  "next_action": "Open PR #14 and await CI + 300s timing guard",
   "last_message_summary": "استلام تقرير وحزمة Round 10 من الاستشاري، شرح اكتشافات الجولة 10 (الكتل المصطنعة وحلها بـ attest)، وتثبيت المرساة r10 بنجاح.",
-  "last_updated": "2026-09-06T17:57:29Z"
+  "last_updated": "2026-09-06T19:14:00Z"
 }

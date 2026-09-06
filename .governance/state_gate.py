@@ -40,7 +40,8 @@ CLOSERS = {"precheck", "self_review", "attest", "state_gate"}
 
 
 def git(root, *a) -> str:
-    return subprocess.run(["git", *a], capture_output=True, text=True, cwd=root).stdout.strip()
+    p = subprocess.run(["git", *a], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=root)
+    return (p.stdout or "").strip()
 
 
 def utcnow() -> str:
