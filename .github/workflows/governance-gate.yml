@@ -12,7 +12,10 @@ permissions:
 jobs:
   merge-audit:
     # R38: PR #3 was self-merged 4 s after opening with zero reviews. Server-side rulesets are the
-    # real fix (owner must import them); until then every such merge turns main RED here.
+    # real fix (owner must import them). NOTE (R101, Round 16): this job runs on the pull_request:closed
+    # event and is attributed to the PR HEAD sha, not to the merge commit — main's own push run stays
+    # green. It is visible via `ci_status.py --pr <n>` (after merge) or `--sha <merge sha>` (Round-16 version),
+    # NOT in the branch badge. PR #15 (R99) was self-merged with 0 reviews; this job failed; nobody saw it.
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +63,8 @@ jobs:
           grep -q "Rule 4" /tmp/r36
       - name: merge_timing_guard self-test (offline; must flag PR #3's real timestamps)
         run: python .governance/merge_timing_guard.py --self-test
+      - name: ci_status self-test (offline; R100 — merge-audit failure on the PR head must not hide behind a green merge sha)
+        run: python .governance/ci_status.py --self-test
       - name: checker family self-tests (attest / claim_check / intent_gate / read_proof) — Round 12
         run: |
           set -e
