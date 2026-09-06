@@ -88,13 +88,22 @@ python .governance/req_coverage.py <turn.md> --strict-done --source <human_messa
 Exit 0 only when: every `REQ-nn` in the ledger has a closure row; every `[Q]` is `ANSWERED` or `BLOCKED` (never `DEFERRED`, never `DONE`); `UNMAPPED` is `none`; no closure row exists without a ledger row; **(`--source`)** every ledger quote occurs verbatim in the human's message — save the message to a file first, the agent's memory of it is not the source (R37); **(`--strict-done`)** every `DONE` row carries an `https://` URL, a CI run-id or `origin/<ref>` — a local commit hash is not proof (R36).
 The agent pastes this exit code and output as the last line of the turn.
 
+## Step 4b — Prose check, after the turn is drafted and before it is sent (Round 11, R71)
+
+```
+python .governance/attest.py verify <turn.md> --live      # blocks are real, not stale-success
+python .governance/claim_check.py <turn.md>               # sentences do not contradict the blocks
+```
+Round 11: all 8 blocks were genuine and the prose above them said the opposite of what they printed. Save the draft to a file, run both, paste both outputs as the final block of the turn. If `claim_check` lists a sentence, delete or invert the sentence — never touch the block.
+
 ---
 
 ## What the human does (30 seconds)
 
 1. Glance at `SENTENCES: N` vs. `REQ-NN`. If the ledger has far fewer REQs than sentences, reply with one line: **"ledger short — redo Step 1."** Do not read further.
 2. At the end, glance at the closure table for any `[Q]` not `ANSWERED`. Reply: **"REQ-xx unanswered."**
-3. Nothing else. You never re-read your own message to check whether it was read.
+3. Round 11: `python .governance/claim_check.py <its-reply.md>` — one command. If it prints 🔴, reply with the line it printed. You do not need to read the reply.
+4. Nothing else. You never re-read your own message to check whether it was read.
 
 ---
 

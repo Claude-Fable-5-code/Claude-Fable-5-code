@@ -55,6 +55,7 @@ TOOLS = {  # header regex → (tool, allowed line regexes)
         r"^(ℹ️  |✅ |⛔ |⚠️  )?req_coverage:.*$", r"^  .*$", r"^UNCOVERED.*$",
     ],
     "merge_pr": [r"^PR #\d+ .*$", r"^  .*$", r"^(⛔|✅|ℹ️) .*$"],
+    "claim_check": [r"^🔴 C[1-6] .*$", r"^      ….*$", r"^(⛔|✅) claim_check: .*$"],
     "attest": [r"^.*$"],
 }
 FOOT = re.compile(r"^ATTEST tool=(\S+) sha256=([0-9a-f]{16}) utc=(\S+) head=([0-9a-f]{7}) exit=(-?\d+) cmd=(.*)$")
@@ -90,9 +91,30 @@ def run(cmd: list[str]) -> int:
     return 0
 
 
+TIME_DEPENDENT = {"ci_status", "remote_proof"}  # outputs depend on remote state at run time
+
+
 def blocks(text: str):
+    """Yield (tool, lines) for every tool block. Fenced ``` blocks first; then (R78, Round 11) any
+    ATTEST footer that sits OUTSIDE a fence — copy/paste into gists and chat clients strips fences,
+    and a verifier that then silently skips half the blocks is itself a fabricated 'all genuine'."""
+    fenced_spans = []
     for m in re.finditer(r"```[^\n]*\n(.*?)```", text, re.S):
-        body = m.group(1).rstrip("\n").split("\n")
+        fenced_spans.append(m.span())
+        yield from _classify(m.group(1))
+    lines = text.split("\n"); pos = 0; starts = []
+    for i, ln in enumerate(lines):
+        if FOOT.match(ln.strip()) and not any(a <= pos < b for a, b in fenced_spans):
+            j = i - 1
+            while j >= 0 and lines[j].strip() and lines[j].strip() != "text" and not FOOT.match(lines[j].strip()):
+                j -= 1
+            yield from _classify("\n".join(lines[j + 1:i + 1]))
+        pos += len(ln) + 1
+
+
+def _classify(raw: str):
+    for _ in (0,):
+        body = raw.rstrip("\n").split("\n")
         # drop a leading "$ cmd" / "python ..." prompt line the agent likes to show
         while body and re.match(r"^\s*(\$|python|py)\s", body[0]):
             body = body[1:]
@@ -129,6 +151,13 @@ def verify(path: str, live: bool) -> int:
                 p = subprocess.run(shlex.split(cmd), capture_output=True, text=True, cwd=GOV.parent, timeout=120)
                 now = (p.stdout + p.stderr).rstrip("\n")
                 if h(now) != fh:
+                    # R79 (Round 11, self-finding): ci_status / remote_proof describe REMOTE STATE, which legitimately
+                    # changes after a push or merge. An honest pre-push block re-run post-push differs. That is STALE,
+                    # not forged. It is a problem only if the pasted block claimed success and live disagrees.
+                    if tool in TIME_DEPENDENT:
+                        if int(rc) == 0 and p.returncode != 0:
+                            print(f"🔴 REGRESSED  [{tool}] pasted exit=0 but live exit={p.returncode} — the claimed state no longer holds. Live output:"); print("\n".join("      " + l for l in now.split("\n"))); bad += 1; continue
+                        print(f"🕒 STALE      [{tool}] utc={utc} head={fhead} exit={rc} — genuine at the time; remote state moved since (live exit={p.returncode})"); continue
                     print(f"🟡 DIVERGED   [{tool}] live re-run differs from pasted block (pasted utc={utc}). Live output:"); print("\n".join("      " + l for l in now.split("\n"))); bad += 1; continue
             except Exception as e:
                 print(f"🟡 UNCHECKED  [{tool}] could not re-run: {e}")

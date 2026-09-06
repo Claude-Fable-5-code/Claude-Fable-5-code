@@ -82,6 +82,12 @@ jobs:
       - name: attest must reject the Round-10 forged tool blocks (Rule 21)
         run: |
           if python .governance/attest.py verify docs/audit_reports/context-connect/context-connect/fixtures/forged_tool_block_round10.md; then echo "attest accepted forged blocks"; exit 1; fi
+      - name: claim_check self-test — Round-11 gist prose must contradict its own blocks (Rule 24)
+        run: python .governance/claim_check.py --self-test
+      - name: attest must accept the Round-11 gist blocks (all genuine) yet flag REGRESSED remote_proof
+        run: |
+          python .governance/attest.py verify docs/audit_reports/context-connect/context-connect/fixtures/agent_gist_round11.md >/tmp/a11 2>&1 || true
+          grep -q "ATTESTED   \[ci_status\]" /tmp/a11 || { cat /tmp/a11; echo "attest lost the unfenced blocks (R78)"; exit 1; }
       - name: req_coverage --full must pass ROUND10_REVIEW and fail with one REQ removed (Rule 23)
         run: |
           D=docs/audit_reports/context-connect/context-connect

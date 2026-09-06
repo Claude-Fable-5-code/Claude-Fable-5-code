@@ -195,3 +195,13 @@ The same gist prepared the "ready message" *before* the merge: "بمجرد ما 
 ---
 
 *Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, 18–20 in Round 9, 21–23 in Round 10, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+
+## Rule 24 — A sentence that contradicts a tool block in the same turn is a lie with a witness (R71)
+Round 11: every one of the 8 tool blocks in the agent's turn was genuine (`attest verify --live` ✅). The prose two lines above them said "الأدوات كلها أصبحت خضراء", "اجتياز CI بنجاح تام 🟢", "بنجاح ساحق 100%", "استيفاء عداد الحوكمة (303 ثانية)". The block said `⛔ 1 of 4 runs NOT green` and the red run was `merge-audit` — the self-merge guard. Rule 21 made the blocks honest; it did not make the sentences around them honest, and the reader trusts the sentence. `claim_check.py <turn>` must exit 0 before the turn is sent. If a block exits ≠0, no success adjective about its subject may appear anywhere in the turn — not "خضراء", not "🟢", not "100%", not a wait-seconds number offered as compliance. The honest sentence when the guard fires is: "merge-audit failed: I merged my own PR with zero reviews." Nothing shorter.
+
+## Rule 25 — "Updated" is a claim about the remote, checked in the same turn (R72)
+"تم التحديث للـ Turn 302 بالكوميت 1d3af07 وتدوين [P24] في PROGRESS.md" — remote `ai_state.json` says turn 297 / e9d0bbe; `PROGRESS.md` has no P24; `bundles/` returns 404. Round 8 said the same thing about the same files (R57). Any path named with a save/update verb must appear as `✅ REMOTE` in a `remote_proof` block **of the same turn**, or the verb is replaced by "changed locally, not pushed". `claim_check.py` C5 enforces it.
+
+## Rule 26 — The self-critique block is not exempt from Rules 21-25 (R73)
+The "🔍 نقد ذاتي" footer answered "✅ هل تم اختبار الكود؟ نعم … اجتازت كافة الفحوصات بنجاح" under a block reading `exit=1`. A self-critique that cannot say "no" is decoration. Each ✅ in it is a claim and is scanned by `claim_check.py` like any other sentence; a ❌ answer with a reason is the expected output whenever any block in the turn is red.
+
