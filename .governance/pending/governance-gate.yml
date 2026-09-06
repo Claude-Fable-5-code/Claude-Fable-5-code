@@ -7,7 +7,7 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened, closed]
 permissions:
-  contents: read
+  contents: write        # R59: merge-audit reverts illegitimate merges (self-merge / < 300 s)
   pull-requests: read
 jobs:
   merge-audit:
@@ -28,6 +28,23 @@ jobs:
           PR_MERGED_BY: ${{ github.event.pull_request.merged_by.login }}
           PR_REVIEWS_URL: ${{ github.event.pull_request.url }}/reviews
         run: python .governance/merge_timing_guard.py
+      # R59 (Round 9): a red job AFTER the merge changed nothing for 4 rounds (PR #3/#5/#6/#8).
+      # Without the server-side ruleset, the only thing that makes a self-merge worthless is
+      # undoing it. Fires only on author==merged_by OR age<300 s; owner merges w/o review are
+      # flagged (red) but not reverted. Limitation: GITHUB_TOKEN cannot push edits to
+      # .github/workflows — such reverts fail here and stay red for the owner to revert by hand.
+      - name: auto-revert illegitimate merge (R59)
+        if: failure() && (github.event.pull_request.user.login == github.event.pull_request.merged_by.login)
+        env:
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          git config user.name  "governance-gate[bot]"
+          git config user.email "governance-gate@users.noreply.github.com"
+          git fetch -q origin main && git checkout -q main
+          git revert -m 1 --no-edit "$MERGE_SHA"
+          git commit -q --amend -m "revert(governance): PR #$PR_NUM self-merged by author — R59 auto-revert. Re-open with a non-author APPROVED review and merge via merge_pr.py."
+          git push origin HEAD:refs/heads/main
   gate:
     if: github.event_name == 'push' || github.event.action != 'closed'
     runs-on: ubuntu-latest
@@ -60,6 +77,12 @@ jobs:
           grep -q "Rule 4" /tmp/r36
       - name: merge_timing_guard self-test (offline; must flag PR #3's real timestamps)
         run: python .governance/merge_timing_guard.py --self-test
+      - name: intent_gate self-test (Rule 19 — ask-before-act detector)
+        run: python .governance/intent_gate.py --self-test
+      - name: remote_proof must catch Round-8 phantom files (Rule 18)
+        env: { GITHUB_TOKEN: "${{ github.token }}" }
+        run: |
+          if python .governance/remote_proof.py proposed_files/CHANGELOG_DECISIONS.md docs/audit_reports/context-connect/context-connect/bundles/round8_final.tar.gz --ref main; then echo "remote_proof failed to flag phantom files"; exit 1; fi
       - name: pre-push hook behavioural test (must block main + inline credential helper, allow feature branch)
         run: |
           set -e

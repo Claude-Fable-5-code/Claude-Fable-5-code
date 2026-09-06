@@ -25,12 +25,14 @@ def repo(argv):
 def token():
     t = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if t: return t
-    try: return subprocess.check_output(["gh", "auth", "token"], text=True).strip()
-    except Exception: print("⛔ ci_status: no token"); sys.exit(2)
+    try: return subprocess.check_output(["gh", "auth", "token"], text=True, stderr=subprocess.DEVNULL).strip()
+    except Exception: return None  # public repos: anonymous API works (60 req/h) — R56
 
 def gh(r, path):
-    req = urllib.request.Request(f"https://api.github.com/repos/{r}{path}",
-        headers={"Authorization": f"Bearer {token()}", "Accept": "application/vnd.github+json"})
+    h = {"Accept": "application/vnd.github+json"}
+    t = token()
+    if t: h["Authorization"] = f"Bearer {t}"
+    req = urllib.request.Request(f"https://api.github.com/repos/{r}{path}", headers=h)
     with urllib.request.urlopen(req, timeout=30) as resp: return json.load(resp)
 
 def runs_for(r, sha):

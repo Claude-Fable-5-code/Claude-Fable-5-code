@@ -13,6 +13,13 @@ So this protocol does not ask the agent to read carefully. It asks the agent to 
 
 ---
 
+## Step 0 — Save, then detect intent (Round 9)
+
+1. `fixtures/human_msg_<n>.txt` ← the human message, byte-for-byte, before anything else (Rule 14).
+2. `python .governance/intent_gate.py detect fixtures/human_msg_<n>.txt`
+   - `MODE: PLAN-ONLY` → the whole turn is one ` ```plan-only ` block (UNDERSTOOD / I WILL / I WILL NOT / WAITING FOR). Zero tool calls that change state. Stop. (Rule 19)
+   - `MODE: ACT` → continue to Step 1.
+
 ## Step 1 — REQ ledger BEFORE any tool call
 
 The agent's first output in the turn is a fenced block:
@@ -36,6 +43,10 @@ Rules for the ledger:
 - A question mark, or an interrogative in any language ("ازاي", "هل", "ليه", "why", "how"), **always** produces a `[Q]` REQ.
 - A constraint stated once ("never leave anything uncommitted", "اوعي تنسي") becomes a `[RULE]` REQ and is copied into `Root/ANCHORS.md` if not already there.
 - Links pasted by the human are each a REQ: `[LINK] "<url>" → read fully; report what it contains`.
+
+## Step 1b — Size does not matter; the ledger does
+
+"Small or large message, see all of it" — the mechanism is identical. A 3-word message produces a 1-row ledger. A 3,000-word message produces N rows and `req_coverage.py --coverage-min 85` prints every span ≥ 12 chars that no row quotes. The agent does not decide what is important; the checker decides what is missing.
 
 ## Step 2 — Work
 
