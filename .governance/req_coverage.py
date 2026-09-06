@@ -43,6 +43,7 @@ ALLOWED = {"DONE", "ANSWERED", "RULE-KEPT", "CTX", "BLOCKED", "DEFERRED"}
 LEDGER_RX = re.compile(r"```req-ledger\s*\n(.*?)```", re.S)
 CLOSURE_RX = re.compile(r"```req-closure\s*\n(.*?)```", re.S)
 LEDGER_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[(ASK|Q|RULE|CTX|LINK)\]\s+\"(.+?)\"", re.M)
+ANY_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+\[([A-Z-]+)\]", re.M)
 CLOSURE_ROW = re.compile(r"^\s*(REQ-\d{2,})\s+([A-Z-]+)\b(.*)$", re.M)
 SENT_RX = re.compile(r"^\s*SENTENCES:\s*(\d+)", re.M)
 COV_RX = re.compile(r"^\s*COVERAGE:", re.M)
@@ -83,7 +84,17 @@ def main(argv: list[str]) -> int:
     if not cm:
         print("⛔ req_coverage: no ```req-closure``` block found (Step 3 skipped)"); return 2
 
+    problems: list[str] = []
     ledger = {m.group(1): (m.group(2), m.group(3)) for m in LEDGER_ROW.finditer(lm.group(1))}
+    # R49: a row that LOOKS like a REQ but uses an unknown tag ([FIX] [VERIFY] [REPORT] …) was silently
+    # skipped — so it inflated the REQ count in prose while escaping every check. Now it is a violation.
+    for m in ANY_ROW.finditer(lm.group(1)):
+        if m.group(1) not in ledger:
+            problems.append(f"{m.group(1)} uses tag [{m.group(2)}] — only ASK|Q|RULE|CTX|LINK are valid (R49: unparsed rows are not REQs)")
+    # R49b: SENTENCES/COVERAGE header must match parsed rows (no prose-only "23 REQs")
+    sm = SENT_RX.search(lm.group(1))
+    if sm and int(sm.group(1)) != len(ledger):
+        problems.append(f"SENTENCES: says {sm.group(1)} but {len(ledger)} valid REQ rows parsed (R49)")
     closure_rows = CLOSURE_ROW.findall(cm.group(1))
     closure: dict[str, list[str]] = {}
     proof_text: dict[str, str] = {}
@@ -91,13 +102,16 @@ def main(argv: list[str]) -> int:
         closure.setdefault(rid, []).append(state)
         proof_text[rid] = rest
 
-    problems: list[str] = []
     warnings: list[str] = []
 
     if not ledger:
         problems.append("ledger has zero parseable REQ rows (format: REQ-01 [ASK] \"quote\" → …)")
 
     for rid, (kind, quote) in ledger.items():
+        # R48: verbatim check FIRST — must run even when the closure row is missing
+        # (previously sat after `continue`, so unclosed REQs escaped the source check).
+        if source_text is not None and norm(quote) not in source_text:
+            problems.append(f"{rid} quote is NOT verbatim in --source (paraphrase drift, R37): \"{quote[:60]}\"")
         states = closure.get(rid)
         if not states:
             problems.append(f"{rid} [{kind}] has NO closure row — dropped: \"{quote[:50]}\"")
@@ -115,8 +129,6 @@ def main(argv: list[str]) -> int:
             problems.append(f"{rid} is a RULE but closed as {st} — rules must be RULE-KEPT or BLOCKED")
         if strict_done and st == "DONE" and not PROOF_RX.search(proof_text.get(rid, "")):
             problems.append(f"{rid} DONE without second-system proof (URL / run-id / origin/<ref>; a local hash does not count) — use BLOCKED if push/CI is pending (Rule 4)")
-        if source_text is not None and norm(quote) not in source_text:
-            problems.append(f"{rid} quote is NOT verbatim in --source (paraphrase drift, R37): \"{quote[:60]}\"")
 
     for rid in closure:
         if rid not in ledger:

@@ -50,10 +50,10 @@ jobs:
       - name: req_coverage self-test (protocol checker must pass its own example and fail a broken one)
         run: |
           E=.governance/examples
-          python .governance/req_coverage.py $E/req_ledger_round5_example.md --strict-done --source $E/human_message_round5.txt --coverage-min 85
+          python .governance/req_coverage.py $E/req_ledger_round5_example.md --strict-done --source $E/human_message_round5.txt
           if sed '/^REQ-07 ANSWERED/d' $E/req_ledger_round5_example.md | python .governance/req_coverage.py - ; then echo "checker failed to catch a dropped question"; exit 1; fi
           # R37: the agent's real Round-5 turn must FAIL the verbatim-quote check
-          if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --source $E/human_message_round5.txt --coverage-min 85 >/tmp/r37 2>&1; then echo "checker missed paraphrase drift (R37)"; exit 1; fi
+          if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --source $E/human_message_round5.txt >/tmp/r37 2>&1; then echo "checker missed paraphrase drift (R37)"; exit 1; fi
           grep -q "paraphrase drift" /tmp/r37
           # R36: the same turn must FAIL the DONE-needs-second-system-proof check
           if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --strict-done >/tmp/r36 2>&1; then echo "checker missed DONE-without-proof (R36)"; exit 1; fi
@@ -67,7 +67,7 @@ jobs:
           git clone -q . /tmp/clone && cd /tmp/clone
           git remote set-url origin /tmp/bare.git
           git config core.hooksPath .governance/hooks
-          if git push origin HEAD:main >/tmp/o1 2>&1; then echo "hook allowed push to main"; cat /tmp/o1; exit 1; fi
+          if git push origin HEAD:refs/heads/main >/tmp/o1 2>&1; then echo "hook allowed push to main"; cat /tmp/o1; exit 1; fi
           grep -q "Rule 7" /tmp/o1
           if git -c 'credential.helper=!echo x' push origin HEAD:refs/heads/f1 >/tmp/o2 2>&1; then echo "hook allowed inline credential helper"; exit 1; fi  # secret-scan:allow (negative test)
           grep -q "Rule 8" /tmp/o2

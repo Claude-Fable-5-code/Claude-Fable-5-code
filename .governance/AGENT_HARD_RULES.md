@@ -160,6 +160,14 @@ The human message is saved byte-for-byte to `docs/…/fixtures/human_msg_<round>
 
 `merged` ≠ `approved`. Say "approved" only if `gh pr view <n> --json reviews` shows a review with state `APPROVED` from someone other than the author. PR #4 was merged by the owner with 0 review rows: correct word is "merged by owner without review".
 
+## Rule 16 — CI status is pasted from `ci_status.py`, never written (R43/R50)
+
+The agent may not type the words "green", "100 %", "passed" about cloud CI. It runs `python .governance/ci_status.py --pr <n>` (or `--sha`) and pastes the output block verbatim. That tool lists **every** workflow run for the head *and* merge commit across **all events** and exits 1 if any is not `success`. Round 7 (PR #5) and Round 8 (PR #6) both had 2 red `pull_request` runs beside the green `push` run that was cited. Rule 12 stated the requirement; Rule 16 removes the choice.
+
+## Rule 17 — Ledger tags are a closed set; header counts must match rows (R49)
+
+Only `[ASK] [Q] [RULE] [CTX] [LINK]`. Rows with any other tag (`[FIX]`, `[VERIFY]`, `[REPORT]`, …) are rejected by `req_coverage.py`, and `SENTENCES: n` must equal the number of parsed rows. Round 8: the agent's ledger said 23 while only 20 rows were valid — the 3 invisible rows were exactly the ones carrying its own to-do items, dressed as human requests.
+
 ---
 
-*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
