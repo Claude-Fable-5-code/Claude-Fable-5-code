@@ -1,0 +1,194 @@
+From ee99432e4b019426ef24599dfc008d9e48e0c476 Mon Sep 17 00:00:00 2001
+From: genspark_dev <genspark_dev@genspark.ai>
+Date: Sat, 5 Sep 2026 23:51:58 +0000
+Subject: [PATCH 5/8] =?UTF-8?q?feat(req=5Fcoverage):=20--coverage-min=20P?=
+ =?UTF-8?q?=20(R47)=20=E2=80=94=20%=20of=20source=20chars=20inside=20quote?=
+ =?UTF-8?q?s,=20prints=20uncovered=20spans;=20example=20ledger=20completed?=
+ =?UTF-8?q?=2015=E2=86=9222=20REQs;=20protocol=20Step=201b;=20workflow=20u?=
+ =?UTF-8?q?pdate=20in=20pending/?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .governance/FULL_READ_PROTOCOL.md             |  6 +++
+ .../examples/req_ledger_round5_example.md     | 18 +++++++-
+ .governance/pending/README.md                 | 21 +++-------
+ .governance/pending/governance-gate.yml       |  4 +-
+ .governance/req_coverage.py                   | 42 ++++++++++++++++++-
+ 5 files changed, 70 insertions(+), 21 deletions(-)
+
+diff --git a/.governance/FULL_READ_PROTOCOL.md b/.governance/FULL_READ_PROTOCOL.md
+index fe043a4..35fa14b 100644
+--- a/.governance/FULL_READ_PROTOCOL.md
++++ b/.governance/FULL_READ_PROTOCOL.md
+@@ -55,6 +55,12 @@ UNMAPPED: none
+ 
+ Allowed states: `DONE | ANSWERED | RULE-KEPT | CTX | BLOCKED | DEFERRED`. Nothing else. **Every REQ from Step 1 appears exactly once.** A REQ that appears in the ledger but not in the closure is a T1 violation — same weight as a failing CI gate.
+ 
++## Step 1b — Character coverage (Round 7, R47)
++
++`--source` proves every quote exists in the message. It does **not** prove the message was consumed: a ledger of 3 real quotes from a 20-sentence message passes `--source`. `--coverage-min P` closes that hole: the checker marks every non-space character of the message that lies inside some quote and fails if fewer than P % are marked, **printing the exact uncovered spans**. Floor for this project: **85 %**. Tags `[CTX]` exist precisely so filler sentences can be quoted without inventing a task for them.
++
++Operational rule: the human message is saved byte-for-byte to `docs/…/fixtures/human_msg_<round>.txt` **before** the ledger is written (it is the `--source`). The agent never types a quote from memory — it copies from that file. Round 7 note: the consultant itself produced a quote from memory that belonged to a *different* message and was caught by this check.
++
+ ## Step 4 — Mechanical check
+ 
+ ```
+diff --git a/.governance/examples/req_ledger_round5_example.md b/.governance/examples/req_ledger_round5_example.md
+index ed51052..df6e7db 100644
+--- a/.governance/examples/req_ledger_round5_example.md
++++ b/.governance/examples/req_ledger_round5_example.md
+@@ -2,7 +2,7 @@
+ 
+ ```req-ledger
+ SOURCE: https://gist.github.com/pijsal1-tech/9c72… … push-per-chunk لمقاومة الـresets
+-SENTENCES: 13
++SENTENCES: 22
+ REQ-01 [LINK]  "https://gist.github.com/pijsal1-tech/9c728a8267a855a080a200dfc676f800 شوف رابط كمان ده"  → read the gist in full; report contents
+ REQ-02 [ASK]   "لسه مش كالم برضو عاوز تشوف اصح مناسب ليه"                                            → still not complete; find what is truly right for him
+ REQ-03 [ASK]   "علشان مفيش حاجه تكرر تاني"                                                              → goal: nothing recurs again → prevention must be mechanical
+@@ -17,8 +17,15 @@ REQ-11 [ASK]   "وامعل ملفات برضو علشان نرفعه ع جيت 
+ REQ-12 [LINK]  "https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/tree/main"                  → inspect the live repo
+ REQ-13 [ASK]   "مش عاوزك تسيب حاجه راجع كل حاجه فص فص كل حاجه و كل حاجه تحلص حدث ملفات فورا لحظي"     → review everything piece by piece; update files immediately as each finishes
+ REQ-14 [RULE]  "عشان جلسه  بتوقف  ف اي وقت"                                                             → session can stop any time → commit per chunk
++REQ-16 [CTX]   "و صحيح مهم جدا جدا ليا كمان اني"                                                          → emphasis marker for REQ-06
++REQ-17 [CTX]   "او تاسكات المهم عندي"                                                                      → tail of REQ-08 (tasks = تاسكات)
++REQ-18 [RULE]  "مهم جدا جدا انه يشوف و يقراء كل حرف و كل كلمه و كل سطر"                                    → restated: read every char/word/line
++REQ-19 [Q]     "صحيح كمان هل هو لحد الان اكتشفته بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟"                    → WHERE exactly does it hallucinate, so we can constrain it more
++REQ-20 [Q]     "وكمان هل نفذ كام ف %؟؟ نسبه؟"                                                             → what percentage has it executed
++REQ-21 [Q]     "وكمان رايك و تقترح من جلسات هل نعمل معاه اي علشان نحكومه كويس جيدا جدا جدا يكون مفيش مخرج نهائيه؟؟" → session-level proposal so there is no escape
++REQ-22 [ASK]   "(push-per-chunk لمقاومة الـresets): مجلد شوف انت مكناهم مناسب فين بقي"                   → choose the right folder for the files
+ REQ-15 [RULE]  "اوعي تنسي ده Sandbox reset مجددًا. أستعيد وأجمّد الخطة فورًا ثم أنفّذ بchunks صغيرة مدفوعة" → on reset: restore, freeze plan first, push-per-chunk
+-COVERAGE: 15 REQs from 13 sentences — none
++COVERAGE: 22 REQs from 22 sentences — none
+ ```
+ 
+ … (work) …
+@@ -39,5 +46,12 @@ REQ-12 DONE      live origin/main=46d524c inspected via https://api.github.com/r
+ REQ-13 RULE-KEPT each chunk committed immediately (7 commits); handoff written before analysis
+ REQ-14 RULE-KEPT HANDOFF_ROUND5.md written first; commit after every file
+ REQ-15 RULE-KEPT sandbox state checked first (no reset this time); plan frozen in HANDOFF_ROUND5.md before work
++REQ-16 CTX       —
++REQ-17 CTX       —
++REQ-18 RULE-KEPT ledger built from the verbatim message file; --coverage-min enforced
++REQ-19 ANSWERED  ROUND5_REVIEW §7 / ROUND6_REVIEW §1 — state reports, not content
++REQ-20 ANSWERED  ROUND6_REVIEW §2 — 77% (27/35)
++REQ-21 ANSWERED  ROUND6_REVIEW §3 — session rules
++REQ-22 DONE      docs/audit_reports/context-connect/context-connect/ on origin/genspark_ai_developer
+ UNMAPPED: none
+ ```
+diff --git a/.governance/pending/README.md b/.governance/pending/README.md
+index d1023eb..1b0d1a5 100644
+--- a/.governance/pending/README.md
++++ b/.governance/pending/README.md
+@@ -1,16 +1,5 @@
+-# Pending: workflow change that the sandbox token may not push
+-
+-GitHub refuses pushes that modify `.github/workflows/*` from a token without the `workflows`
+-scope (`refusing to allow a GitHub App to create or update workflow`). So this PR carries the
+-new workflow **here** instead, and the live one is unchanged in this branch.
+-
+-Owner applies (one command, then commit on the PR branch or after merge):
+-
+-```
+-cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml
+-git add .github/workflows/governance-gate.yml && git commit -m "ci: apply Round-6 governance-gate (fixtures, guard self-test, merge-audit job)"
+-```
+-
+-What it adds vs. the live workflow: `--strict-done`/`--source` positive + negative fixtures,
+-`merge_timing_guard --self-test`, and the `merge-audit` job on `pull_request: closed` (R38).
+-Until applied, the new checks exist in the tree but CI does not run them.
++# pending/ — workflow changes the sandbox token cannot push
++Round 7: `governance-gate.yml` adds `--coverage-min 85` (R47) to both req_coverage steps.
++Apply:
++    cp .governance/pending/governance-gate.yml .github/workflows/governance-gate.yml && git add -A && git commit -m "ci: R47 coverage-min" 
++Then open a PR and **wait ≥ 5 min + 1 approval** before merging (Rule 10). PR #5 was merged in 3 s and `merge-audit` went RED — do not repeat.
+diff --git a/.governance/pending/governance-gate.yml b/.governance/pending/governance-gate.yml
+index 3a3ad61..f8dd245 100644
+--- a/.governance/pending/governance-gate.yml
++++ b/.governance/pending/governance-gate.yml
+@@ -50,10 +50,10 @@ jobs:
+       - name: req_coverage self-test (protocol checker must pass its own example and fail a broken one)
+         run: |
+           E=.governance/examples
+-          python .governance/req_coverage.py $E/req_ledger_round5_example.md --strict-done --source $E/human_message_round5.txt
++          python .governance/req_coverage.py $E/req_ledger_round5_example.md --strict-done --source $E/human_message_round5.txt --coverage-min 85
+           if sed '/^REQ-07 ANSWERED/d' $E/req_ledger_round5_example.md | python .governance/req_coverage.py - ; then echo "checker failed to catch a dropped question"; exit 1; fi
+           # R37: the agent's real Round-5 turn must FAIL the verbatim-quote check
+-          if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --source $E/human_message_round5.txt >/tmp/r37 2>&1; then echo "checker missed paraphrase drift (R37)"; exit 1; fi
++          if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --source $E/human_message_round5.txt --coverage-min 85 >/tmp/r37 2>&1; then echo "checker missed paraphrase drift (R37)"; exit 1; fi
+           grep -q "paraphrase drift" /tmp/r37
+           # R36: the same turn must FAIL the DONE-needs-second-system-proof check
+           if python .governance/req_coverage.py $E/negative_agent_turn_round6.md --strict-done >/tmp/r36 2>&1; then echo "checker missed DONE-without-proof (R36)"; exit 1; fi
+diff --git a/.governance/req_coverage.py b/.governance/req_coverage.py
+index 226e382..629ed06 100644
+--- a/.governance/req_coverage.py
++++ b/.governance/req_coverage.py
+@@ -14,6 +14,10 @@ Reads an agent turn (file or stdin) containing a ```req-ledger``` block and a
+   8. --source FILE   : every ledger quote must occur VERBATIM (whitespace-normalised)
+                        in the human's original message. Catches paraphrase drift (R37:
+                        agent wrote يشوعها, human wrote يشوفها).
++ 10. --coverage-min P : (needs --source) at least P% of the source's non-space characters must
++                       lie inside some ledger quote; prints every uncovered span >= 12 chars
++                       (R47: "every character" — quotes-in-source proves nothing was invented,
++                       coverage proves nothing was SKIPPED)
+   9. --strict-done   : every DONE row must carry second-system proof: an https:// URL,
+                        a CI run-id (8+ digits), or an 'origin/<ref>'. A bare commit hash
+                        is NOT proof (it can exist only locally — R36: a84cbe0 was cited as
+@@ -60,8 +64,15 @@ def main(argv: list[str]) -> int:
+         i = argv.index("--source")
+         if i + 1 >= len(argv):
+             print("⛔ req_coverage: --source needs a file"); return 2
+-        source_text = norm(Path(argv[i + 1]).read_text(encoding="utf-8", errors="replace"))
++        source_raw = Path(argv[i + 1]).read_text(encoding="utf-8", errors="replace")
++        source_text = norm(source_raw)
+         args = [a for a in args if a != argv[i + 1]]
++    cov_min: float | None = None
++    if "--coverage-min" in argv:
++        j = argv.index("--coverage-min")
++        if j + 1 >= len(argv) or source_text is None:
++            print("⛔ req_coverage: --coverage-min needs a percentage and --source"); return 2
++        cov_min = float(argv[j + 1]); args = [a for a in args if a != argv[j + 1]]
+     if not args:
+         print(__doc__); return 2
+     src = sys.stdin.read() if args[0] == "-" else Path(args[0]).read_text(encoding="utf-8", errors="replace")
+@@ -127,6 +138,35 @@ def main(argv: list[str]) -> int:
+     else:
+         problems.append("ledger lacks 'SENTENCES:' line")
+ 
++    if cov_min is not None and source_text is not None:
++        covered = bytearray(len(source_text))
++        for _, (_, quote) in ledger.items():
++            q = norm(quote)
++            if not q: continue
++            start = 0
++            while (k := source_text.find(q, start)) != -1:
++                covered[k:k + len(q)] = b"\x01" * len(q); start = k + 1
++        sig = [i for i, ch in enumerate(source_text) if not ch.isspace()]
++        hit = sum(1 for i in sig if covered[i])
++        pct = 100.0 * hit / max(1, len(sig))
++        # uncovered spans
++        spans, cur = [], None
++        for i, ch in enumerate(source_text):
++            if not covered[i] and not ch.isspace():
++                cur = [i, i] if cur is None else [cur[0], i]
++            elif ch.isspace() and cur is not None and i - cur[1] <= 1:
++                cur[1] = i
++            else:
++                if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
++                cur = None
++        if cur and cur[1] - cur[0] + 1 >= 12: spans.append(source_text[cur[0]:cur[1] + 1].strip())
++        line = f"source coverage {pct:.0f}% of non-space chars inside ledger quotes (min {cov_min:.0f}%)"
++        if pct + 1e-9 < cov_min:
++            problems.append(line + f" — {len(spans)} uncovered span(s):")
++            problems.extend(f"    ⟪{sp[:90]}⟫" for sp in spans[:25])
++        else:
++            print(f"ℹ️  req_coverage: {line}")
++
+     for w in warnings:
+         print(f"⚠️  req_coverage: {w}")
+     if problems:
+-- 
+2.47.3
+

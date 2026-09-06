@@ -1,0 +1,80 @@
+From c0917859fde8c1a12ba215cf104a60258311869e Mon Sep 17 00:00:00 2001
+From: genspark_dev <genspark_dev@genspark.ai>
+Date: Sat, 5 Sep 2026 23:47:38 +0000
+Subject: [PATCH 1/8] =?UTF-8?q?chore(handoff):=20Round=207=20=E2=80=94=20v?=
+ =?UTF-8?q?erbatim=20message=20+=20frozen=20plan=20(Rule=2011,=20before=20?=
+ =?UTF-8?q?analysis)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ .../context-connect/HANDOFF_ROUND7.md         | 30 +++++++++++++++++++
+ .../fixtures/human_msg_round7.txt             | 18 +++++++++++
+ 2 files changed, 48 insertions(+)
+ create mode 100644 docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+ create mode 100644 docs/audit_reports/context-connect/context-connect/fixtures/human_msg_round7.txt
+
+diff --git a/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+new file mode 100644
+index 0000000..c5da734
+--- /dev/null
++++ b/docs/audit_reports/context-connect/context-connect/HANDOFF_ROUND7.md
+@@ -0,0 +1,30 @@
++# HANDOFF — Round 7 (written FIRST, before analysis — Rule 11)
++State on resume: sandbox reset; `main` = 9e0d0eb (PR #5 merged by owner). Fork remote lost.
++
++## REQ ledger (from fixtures/human_msg_round7.txt — verbatim source)
++| REQ | Your words (verbatim) | Status |
++|---|---|---|
++| REQ-1 | `شوف رابط كمان ده` (gist 5116f77…) | TODO |
++| REQ-2 | `عاوز تشوف اصح مناسب ليه هو علشان مفيش حاجه تكرر تاني` | TODO |
++| REQ-3 | `رايك و تقترحات و اعمل ملفات ان الزم عاوز كل حاجه كامله فعلي` | TODO |
++| REQ-4 | `يشوف كلامي كامل بدون هلوسه و بدون ملخص او تمين … مش عاوز يغفل عن اي حرف مش كلمه ولا سطر` | TODO |
++| REQ-5 | `هل رجعلك كل حاجه ولا ف حجات ناقصه بتقع منه ؟؟؟` | TODO |
++| REQ-6 | `وامعل ملفات برضو علشان نرفعه ع جيت هاب` | TODO |
++| REQ-7 | `راجع كل حاجه فص فص` (repo main) | TODO |
++| REQ-8 | `حدث ملفات فورا لحظي عشان جلسه بتوقف ف اي وقت` | RULE (in force) |
++| REQ-9 | `بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟` | TODO |
++| REQ-10 | `نفذ كام ف %؟؟ نسبه؟` | TODO |
++| REQ-11 | `تقترح من جلسات … مفيش مخرج نهائيه؟؟` | TODO |
++| REQ-12 | `بينسي بعد 5 دقيقه و الحل اي بقي` | TODO |
++| REQ-13 | `اوعي تنسي ده … push-per-chunk` | RULE (in force) |
++
++## Chunks
++- [ ] C0 verbatim save + this stub + commit + push
++- [ ] C1 gist fetched, saved raw, compared to repo
++- [ ] C2 repo review فص فص (main @ 9e0d0eb) — what did PR #5 bring, what's missing
++- [ ] C3 REQ-4 design: full-message coverage (no char skipped) — files
++- [ ] C4 REQ-5 gap list: what fell off vs my instructions
++- [ ] C5 ROUND7_REVIEW.md: hallucination shapes, % executed, session proposal, 5-min memory fix
++- [ ] C6 PR
++
++## Export URLs
+diff --git a/docs/audit_reports/context-connect/context-connect/fixtures/human_msg_round7.txt b/docs/audit_reports/context-connect/context-connect/fixtures/human_msg_round7.txt
+new file mode 100644
+index 0000000..4b6cfb6
+--- /dev/null
++++ b/docs/audit_reports/context-connect/context-connect/fixtures/human_msg_round7.txt
+@@ -0,0 +1,18 @@
++https://gist.github.com/pijsal1-tech/5116f7722abbaa8bfcd21d903db566d4
++شوف رابط كمان ده 
++وكمان لسه مش كالم برضو عاوز تشوف اصح مناسب ليه هو علشان مفيش حاجه تكرر تاني وكمان رايك و تقترحات و اعمل ملفات ان الزم عاوز كل حاجه كامله فعلي 
++
++و صحيح مهم جدا جدا ليا كمان اني عاوز يقدر يشوف كلامي كامل بدون هلوسه و بدون ملخص او تمين ازاي يعمل كده بقي او هو يقدر يناسب معاه اي بقي؟؟ المهم عندي رساله صغيره او كبيره يشوفها كلها و يرد عليا كلها حتي لو قسمها لي مهام او تاسكات المهم عندي مش عاوز يغفل عن اي حرف مش  كلمه  ولا سطر مهم جدا جدا انه يشوف و يقراء كل حرف و كل كلمه و كل سطر 
++
++""و صحيح بناء ع كلامك و ارشادك ليه هو هل رجعلك كل حاجه ولا ف حجات ناقصه بتقع منه ؟؟؟ وامعل ملفات برضو علشان نرفعه ع جيت هاب""" 
++
++https://github.com/Claude-Fable-5-code/Claude-Fable-5-code/tree/main
++بص مش عاوزك تسيب حاجه راجع كل حاجه فص فص كل حاجه و كل حاجه تحلص حدث ملفات فورا لحظي عشان جلسه  بتوقف  ف اي وقت
++
++""صحيح كمان هل هو لحد الان اكتشفته بيهلوس ف اي بظبط علشان نحكمه اكتر؟؟ وكمان هل نفذ كام ف %؟؟ نسبه؟ وكمان رايك و تقترح من جلسات هل نعمل معاه اي علشان نحكومه كويس جيدا جدا جدا يكون مفيش مخرج نهائيه؟؟""
++
++""وصحيح كمان انه بينسي بعد 5 دقيقه و الحل اي بقي من ضمن اللي بنعمله؟؟"""
++
++
++اوعي تنسي ده
++Sandbox reset مجددًا. أستعيد وأجمّد الخطة فورًا ثم أنفّذ بchunks صغيرة مدفوعة (push-per-chunk لمقاومة الـresets):
+-- 
+2.47.3
+

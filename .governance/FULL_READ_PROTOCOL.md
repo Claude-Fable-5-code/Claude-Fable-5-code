@@ -55,6 +55,12 @@ UNMAPPED: none
 
 Allowed states: `DONE | ANSWERED | RULE-KEPT | CTX | BLOCKED | DEFERRED`. Nothing else. **Every REQ from Step 1 appears exactly once.** A REQ that appears in the ledger but not in the closure is a T1 violation — same weight as a failing CI gate.
 
+## Step 1b — Character coverage (Round 7, R47)
+
+`--source` proves every quote exists in the message. It does **not** prove the message was consumed: a ledger of 3 real quotes from a 20-sentence message passes `--source`. `--coverage-min P` closes that hole: the checker marks every non-space character of the message that lies inside some quote and fails if fewer than P % are marked, **printing the exact uncovered spans**. Floor for this project: **85 %**. Tags `[CTX]` exist precisely so filler sentences can be quoted without inventing a task for them.
+
+Operational rule: the human message is saved byte-for-byte to `docs/…/fixtures/human_msg_<round>.txt` **before** the ledger is written (it is the `--source`). The agent never types a quote from memory — it copies from that file. Round 7 note: the consultant itself produced a quote from memory that belonged to a *different* message and was caught by this check.
+
 ## Step 4 — Mechanical check
 
 ```
