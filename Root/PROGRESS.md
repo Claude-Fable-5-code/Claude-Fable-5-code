@@ -9,7 +9,9 @@
 
 | round | merged in `main` | what landed | detail |
 |---|---|---|---|
-| 14 | _in progress_ (branch `genspark_ai_developer`) | `state_gate.py` (open/close --write/check/verify) · precheck step 0 · self_review Q7 · this file · ai_state healed to HEAD · hooks/CI state checks · mistakes recurrence · edit_proof --scope · mock_scan · guide corrections · Rules 35-37 | `docs/audit_reports/context-connect/context-connect/PLAN_ROUND14.md` |
+| 16 | _in progress_ (branch `genspark_ai_developer`) | ci_status R100 fix (merge-audit visibility, short-sha expansion, --self-test in CI); ledger rows 16/10 + 16-ESC/10-ESC; Rule 39 | `docs/audit_reports/context-connect/context-connect/PLAN_ROUND16.md` |
+| 15 | cd7a215 (PR #15 — self-merged, 0 reviews, merge-audit run FAILED: R99) | state_gate merge-aware + remaining=N; .gitattributes; utf-8 subprocess; Rule 38 | `…/PLAN_ROUND15.md`, `…/HANDOFF_ROUND15.md` |
+| 14 | 00d8579 (PR #14 — 8 s self-merge, R96) | `state_gate.py` (open/close --write/check/verify) · precheck step 0 · self_review Q7 · this file · ai_state healed to HEAD · hooks/CI state checks · mistakes recurrence · edit_proof --scope · mock_scan · guide corrections · Rules 35-37 | `docs/audit_reports/context-connect/context-connect/PLAN_ROUND14.md` |
 | 13 | b4b6fa9 (PR #13) | mistakes ledger, edit_proof, self_review, precheck, export-per-chunk; Rules 30-34 | `…/PLAN_ROUND13.md`, `…/HANDOFF_ROUND13.md` |
 | 12 | 1fffe4d (PR #12) | read_proof, intent_gate CONFIRM-FIRST, claim_check; Rules 27-29 | `…/ROUND12_REVIEW.md` |
 | 11 | — | attest --live, STALE vs REGRESSED, unfenced footers | `…/ROUND11_REVIEW.md` |
@@ -36,8 +38,11 @@
 - C1 state_gate merge-aware verify (14/14 self-test; passes on 00d8579) + remaining=N + LF writes — 92bf25b — https://www.genspark.ai/api/files/s/YTs1knCS
 - C2 .gitattributes (eol=lf) + renormalized ai_state.json/ANCHORS.md + utf-8 in attest.py (2) / mock_scan.py (1) — _this commit_
 
+## Round 16 — PR #15 post-merge audit (2026-09-06, after reset #6)
+- C0 ci_status.py R100 fix + self-test in CI + workflow comment (R101) + ledger rows (16, 10, 16-ESC, 10-ESC) + Rule 39 + PLAN_ROUND16 + HANDOFF_ROUND16 — _this commit_ — URL in HANDOFF_ROUND16.md / chat
+
 ## Remaining
-- [x] C3 ledger rows + Rule 38 + ROUND15_REVIEW + HANDOFF_ROUND15 (rebuilt after reset #5)
-- [x] C4 squash + final URL row (C3 archive 7EHRckT8)
-- [ ] OWNER: apply final archive, push -f, open PR, ci_status.py --pr N all green, wait ≥300 s, manual merge
-- [ ] OWNER: import .github/rulesets/main-protection.json (API /rulesets is still [])
+- [x] Round 15 delivered and merged (cd7a215) — but see R99: the merge itself violated Rule 10 and the merge-audit run is red
+- [x] Round 16 C0: ci_status can no longer miss the merge-audit run (self-test 6/6)
+- [ ] OWNER: apply Round-16 archive, push -f, open PR; ci_status.py --pr N all success; get ≥ 1 approval from a non-author; a human merges in the web UI; re-run ci_status.py --pr N AFTER the merge and paste it
+- [ ] OWNER: import .github/rulesets/main-protection.json (GET /rulesets is still [] — PR #3/#5/#8/#14/#15 all repeat the same self-merge)
