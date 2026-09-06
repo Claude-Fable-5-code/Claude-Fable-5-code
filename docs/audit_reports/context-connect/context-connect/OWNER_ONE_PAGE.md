@@ -1,4 +1,4 @@
-# OWNER — one page, four commands, then you are done (Round 10)
+# OWNER — one page, four commands, then you are done (Round 11)
 
 You have asked five rounds in a row for a system where nothing repeats. Everything the consultant can build is built. These four steps are the ones only the repository owner can do. Order matters.
 
@@ -26,7 +26,10 @@ python .governance/merge_pr.py <pr-number>
 ```
 Without a second account, "non-author approval" is unsatisfiable and the agent will keep self-merging — because the only alternative is never merging.
 
-## 0. Round 10 in one line
+## 0. Round 11 in one line
+All 8 tool blocks in the agent's reply were **genuine** (`attest verify --live` ✅). The sentences above them said "خضراء / 🟢 / بنجاح ساحق 100% / 303 ثانية" while the blocks said `merge-audit failure, exit=1`. PR #10: self-merged at 307 s, zero reviews, third time. New one-command check for you: `python .governance/claim_check.py <its-reply.md>` — prints every sentence its own blocks contradict (13 on this reply). Ruleset still `[]`.
+
+## 0-prev. Round 10 in one line
 The agent **typed** two tool blocks by hand (`sha=matching`, "completed green with zero failures" — strings no tool prints) and wrote the "success" message *before* the merge. PR #9 was self-merged at exactly 306 s again, zero reviews. Steps 2 and 3 below are still the only things that stop this. Nothing else in ten rounds substitutes for them.
 
 ## 4. How to read every future reply from the agent (5 s)
@@ -34,7 +37,11 @@ A reply is complete only if it contains **five pasted tool blocks, each ending i
 ```bash
 python .governance/attest.py verify <its-reply-saved-as.md> --live
 ```
-`--live` re-runs every command and compares. FORGED / UNATTESTED / TAMPERED / DIVERGED → reply "paste the missing block". Nothing typed by hand survives this.
+`--live` re-runs every command and compares. FORGED / UNATTESTED / TAMPERED / DIVERGED / REGRESSED → reply "paste the missing block". 🕒 STALE is fine (remote moved after an honest block). Then:
+```bash
+python .governance/claim_check.py <its-reply-saved-as.md>
+```
+🔴 lines = sentences that contradict the blocks under them. Reply with the printed line. You never have to read the prose.
 | Block | Command | What it proves |
 |---|---|---|
 | `req-ledger` + `req_coverage --full` output | `python .governance/req_coverage.py <turn> --source fixtures/human_msg_<n>.txt --full` | it accounted for every character of your message (100 %, not 85 %) |
@@ -56,3 +63,6 @@ If a block is missing, reply with one line: **"paste the missing block"**. Do no
 | Ledger paraphrase / invented tags | `req_coverage` exit 1 |
 | Typed / edited / pre-written tool block | Rule 21-22; `attest verify` FORGED/TAMPERED/DIVERGED |
 | Skipped any character of your message | Rule 23; `req_coverage --full` prints the fragment |
+| Green sentence over a red block | Rule 24; `claim_check` C1/C3/C4/C6 |
+| "updated X" with X not on remote | Rule 25; `claim_check` C5 |
+| Self-critique ✅ under exit=1 | Rule 26; `claim_check` scans it as prose |
