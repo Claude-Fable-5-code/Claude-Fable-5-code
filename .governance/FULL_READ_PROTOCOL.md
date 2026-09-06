@@ -98,11 +98,30 @@ Round 11: all 8 blocks were genuine and the prose above them said the opposite o
 
 ---
 
+## Step 0a — Mirror before anything, when asked (Round 12, R83, Rule 27)
+
+```
+python .governance/intent_gate.py detect fixtures/human_msg_<round>.txt
+```
+If it prints `MODE: CONFIRM-FIRST`, the turn is a single ```mirror block and nothing else — no ledger yet, no tool call, no plan. Quote the human's sentences verbatim under `UNDERSTOOD:`, one reading per sentence, `QUESTION:` for what the text cannot settle, `WAITING FOR: تمام`. Only the next turn (after the human's confirmation) proceeds to Step 1.
+
+## Step 2b — Read the whole file before naming a cause (Round 12, R84, Rule 28)
+
+```
+python .governance/attest.py run -- python .governance/read_proof.py index <file>      # paste the block
+python .governance/read_proof.py check <turn.md>                                        # before sending
+```
+No "the bug is / السبب / الخطأ في" about a file that has no live `read_proof` block in the same turn. `check` also fails a proof whose sha no longer matches the file (you read an older version) or a proof of a different file than the one you diagnose.
+
+## Step 4c — Never type a verdict (Round 12, R81, Rule 29)
+`claim_check.py` C7: any `✅/⛔ <tool>:` line or `MODE:` line outside an attested block fails the turn. The only way to have a verdict in the turn is `attest.py run -- python .governance/<tool>.py …` and pasting what it printed, footer included.
+
 ## What the human does (30 seconds)
 
 1. Glance at `SENTENCES: N` vs. `REQ-NN`. If the ledger has far fewer REQs than sentences, reply with one line: **"ledger short — redo Step 1."** Do not read further.
 2. At the end, glance at the closure table for any `[Q]` not `ANSWERED`. Reply: **"REQ-xx unanswered."**
 3. Round 11: `python .governance/claim_check.py <its-reply.md>` — one command. If it prints 🔴, reply with the line it printed. You do not need to read the reply.
+3b. Round 12: if you asked it to confirm understanding first, `python .governance/intent_gate.py verify <its-reply.md> --human <your-msg.txt>`; if it named a bug, `python .governance/read_proof.py check <its-reply.md>`. Either prints ⛔ → paste that line back.
 4. Nothing else. You never re-read your own message to check whether it was read.
 
 ---
@@ -124,6 +143,7 @@ Round 11: all 8 blocks were genuine and the prose above them said the opposite o
 ```
 [ ] First output of the first turn is a req-ledger block. No tool call precedes it.
 [ ] Last output of every turn is a req-closure block + req_coverage.py exit code.
+[ ] Round 12: intent_gate detect ran on the human message; CONFIRM-FIRST → mirror block only. No cause named without a read_proof block. No verdict line typed.
 ```
 
 ## Known limits (stated so nobody over-trusts this)

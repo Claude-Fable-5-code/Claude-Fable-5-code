@@ -87,6 +87,8 @@ EVIDENCE = a tool block with an ATTEST footer, or nothing.
 Screenshots, "I saw it in the terminal", commit hashes without a URL: not evidence.
 A block that exits ≠0 is evidence AGAINST the claim. Report it as such, in the sentence next to it.
 When a claim in your draft has no block under it, delete the claim.
+Round 12: a *verdict* line (✅ claim_check: / ✅ attest: / MODE: …) is itself a claim — typed = C7 = forged.
+Round 12: naming a bug in a file requires `attest run -- read_proof.py index <file>` in the same turn (Rule 28).
 ```
 | 🔢 Metrics | performance | response time ms |
 | 📁 File Diff | code changes | git diff |

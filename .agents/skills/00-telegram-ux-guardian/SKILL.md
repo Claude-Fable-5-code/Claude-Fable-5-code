@@ -32,6 +32,7 @@ description: حارس تجربة مستخدم بوتات التليجرام (Tel
 
 ### 6. 🔒 حوكمة ترحيل الردود (Governance Relay — Round 11):
 * **إلزامي:** Delivery/relay of a governance turn requires: `attest verify --live` exit 0 AND `claim_check` exit 0 on the exact text being delivered. Relaying a turn strips code fences; `attest.py` handles unfenced footers (R78), but the ATTEST lines themselves must survive the relay byte-for-byte.
+* **إلزامي (Round 12):** Round 12 (R81/R83/R84 — Rules 27-29): (a) `intent_gate.py detect` → **CONFIRM-FIRST** ⇒ the turn is ONE ```mirror block (UNDERSTOOD: verbatim quotes · QUESTION: · WAITING FOR: تمام), zero tool calls/edits/plans. (b) No "the bug is / السبب / الخطأ في" about a file without a live `attest run -- read_proof.py index <file>` block in the same turn; `read_proof.py check <turn>` exit 0. (c) Never type a checker verdict line — `claim_check` C7 fails the turn; verdicts are pasted from `attest run`, footer included.
 
 ---
 
