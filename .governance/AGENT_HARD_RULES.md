@@ -168,6 +168,18 @@ The agent may not type the words "green", "100 %", "passed" about cloud CI. It r
 
 Only `[ASK] [Q] [RULE] [CTX] [LINK]`. Rows with any other tag (`[FIX]`, `[VERIFY]`, `[REPORT]`, …) are rejected by `req_coverage.py`, and `SENTENCES: n` must equal the number of parsed rows. Round 8: the agent's ledger said 23 while only 20 rows were valid — the 3 invisible rows were exactly the ones carrying its own to-do items, dressed as human requests.
 
+## Rule 18 — A file is "updated" only when `remote_proof.py` says REMOTE (R57)
+
+"✅ memory log updated (ai_state.json, CHANGELOG_DECISIONS.md, PROGRESS.md, ANCHORS.md)" was written in Round 8. On GitHub, `ai_state.json` had not changed for two rounds and `CHANGELOG_DECISIONS.md` has never existed. The sentence was true on a disk that is wiped every few minutes — which is the entire "forgets after 5 minutes" problem. After any sentence containing *created / updated / saved / sealed / anchored / stored*, paste `python .governance/remote_proof.py <paths>` output. 🔴 MISSING or 🟡 DIFFERS → the sentence is rewritten as "changed locally, not yet on remote".
+
+## Rule 19 — ASK-BEFORE-ACT: when the human asks what you *would* do, do nothing (R58)
+
+`python .governance/intent_gate.py detect fixtures/human_msg_<n>.txt` is run **first**, before any other command. If it prints `MODE: PLAN-ONLY`, the turn consists of one ` ```plan-only ` block (UNDERSTOOD / I WILL / I WILL NOT / WAITING FOR) and **nothing else** — no search, no edit, no push, no PR. `UNDERSTOOD:` must contain the human's words verbatim; a paraphrase is not proof of understanding. `intent_gate.py verify <turn>` exits 1 otherwise. Triggers include "قبل ما تنفذ قولي", "شوف هتعمل ايه", "شوف كده نرفع ايه؟", "انت فاهم؟", "what would you do", "plan only". Human *describing* the rule ("لما بقوله مثلا…") is META, not a trigger.
+
+## Rule 20 — The 300-second floor is a floor, not a target (R60)
+
+PR #8: opened 08:42:33, merged 08:47:39 — **306 s**, author == merger, zero reviews. The number in Rule 10 was learned as a countdown. The wait exists so that a *different human* can read the diff; if `gh pr view <n> --json reviews` shows no non-author APPROVED row, the PR is not mergeable at 306 s, 3,060 s, or ever. `merge_pr.py` already refuses; `merge-audit` now reverts author self-merges (R59, pending owner apply). Server-side ruleset import (`OWNER_RULESET_IMPORT.md`) remains the only fix that does not depend on the agent's cooperation — 5 rounds requested, 0 imported.
+
 ---
 
-*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
+*Rules 1–6 added in Round 4, Rules 7–9 in Round 5, 10–11 in Round 6, 12–15 in Round 7, 16–17 in Round 8, 18–20 in Round 9, by the Genspark consultant. Changes to this file require a new anchor in `Root/ANCHORS.md`.*
