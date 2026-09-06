@@ -1,10 +1,10 @@
 {
-  "mode": "[DONE]",
-  "current_tag": "[ROUND10-INTEGRATED-LOCAL]",
-  "turn_count": 297,
-  "git_commit": "e9d0bbe",
-  "last_action": "اكتمال دمج PR #9 في main بالكوميت e9d0bbe بنجاح، واستلام حزمة Round 10 وتثبيت أداة attest.py وقاعدة Rule 21 والتغطية الكاملة 100% req_coverage --full (Rule 23) وتشميع المرساة agent_hard_rules_r10 برقم 59cf75cb وأرشفة الحزم.",
-  "next_action": "تشغيل الأدوات عبر attest.py وتجهيز التقرير الصارم للجولة العاشرة متضمناً أختام ATTEST المشفرة.",
+  "mode": "[ACT]",
+  "current_tag": "[ROUND14-PARITY-FIX]",
+  "turn_count": 308,
+  "git_commit": "3e1fc30",
+  "last_action": "Sync proposed_files/.gitignore parity with root .gitignore to satisfy parity gate (verify_sync.py)",
+  "next_action": "Open PR #14 and await CI + 300s timing guard",
   "last_message_summary": "استلام تقرير وحزمة Round 10 من الاستشاري، شرح اكتشافات الجولة 10 (الكتل المصطنعة وحلها بـ attest)، وتثبيت المرساة r10 بنجاح.",
-  "last_updated": "2026-09-06T13:52:00+03:00"
+  "last_updated": "2026-09-06T19:14:00Z"
 }

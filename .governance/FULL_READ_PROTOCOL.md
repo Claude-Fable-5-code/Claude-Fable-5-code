@@ -167,6 +167,25 @@ Q5 re-read:    ✅/❌  missed: «<verbatim from the human message>» | none mis
 Q6 remote:     ✅/❌  evidence: <remote_proof REMOTE> | none — <why>
 ```
 
+## Step 0d — State open at the start, state close at the end (Round 14, R90, Rule 35)
+```
+python .governance/attest.py run -- python .governance/state_gate.py open [--ack-drift]      # FIRST block of the turn
+python .governance/attest.py run -- python .governance/state_gate.py close --write --tag "[ROUND<N>-C<k>]" --last "…" --next "…"   # LAST block, before precheck
+```
+`precheck.py` step 0 (`state_gate check`) fails a turn whose first attested block is not `state_gate open` or whose last is not `state_gate close` on the same head. Pre-commit refuses staged code without a staged `Root/ai_state.json`.
+
+## Step 2e — Edits stay inside the promised lines; no placeholder code (Round 14, R92/R93, Rule 37)
+```
+python .governance/attest.py run -- python .governance/edit_proof.py show <file> --scope A-B   # hunks in HEAD numbering; OUT-OF-SCOPE ⇒ exit 1
+python .governance/attest.py run -- python .governance/mock_scan.py --staged                   # also runs in pre-commit and CI
+```
+
+## Step 2f — A repeated rule needs an ESC row (Round 14, R91, Rule 36)
+```
+python .governance/attest.py run -- python .governance/mistakes.py recurrence                  # precheck step 6b
+python .governance/attest.py run -- python .governance/mistakes.py record --round <N> --rule <R>-ESC "<the mechanism that prevents the third>"
+```
+
 ## Step 5 — Precheck, then send (Round 13, R88, Rule 34)
 ```
 python .governance/attest.py run -- python .governance/precheck.py <turn.md> --source <human.txt>   # paste table; its sha → Q2
@@ -180,6 +199,7 @@ Stops at the first red step. Fix, re-run, paste the green table. Only then send.
 [ ] Last output of every turn is a req-closure block + req_coverage.py exit code.
 [ ] Round 12: intent_gate detect ran on the human message; CONFIRM-FIRST → mirror block only. No cause named without a read_proof block. No verdict line typed.
 [ ] Round 13: PLAN_ROUND<N>.md committed before any tool work; MISTAKES.md read; every chunk row has an export URL; precheck table pasted before sending; self-review has a ❌ or a REMOTE proof.
+[ ] Round 14: first block is `state_gate open`, last is `state_gate close --write`; `mistakes.py recurrence` green (or an -ESC row written); every edit claim with a line range carries `--scope`; `mock_scan --staged` green before every commit.
 ```
 
 ## Known limits (stated so nobody over-trusts this)

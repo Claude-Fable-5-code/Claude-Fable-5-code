@@ -11,12 +11,14 @@ was run by the HUMAN on the agent's turn after it was sent, and every round foun
 could have found itself. This tool runs the whole family on the draft, in dependency order, and stops at
 the first failure so the agent fixes and re-runs instead of sending:
 
+    0 state_gate check     (first block = state_gate open, one ✅ close, nothing but closers after it — Round 14, Rule 35)
     1 intent_gate verify   (mode; CONFIRM-FIRST mirror contract)
     2 attest verify        (every tool block genuine; --live re-runs commands)
     3 claim_check          (prose vs blocks, C1-C7)
     4 read_proof check     (diagnosis needs a full-file proof)
     5 edit_proof check     (edit claim needs a live diff)
     6 mistakes check       (admission needs a ledger row)
+    6b mistakes recurrence (a rule broken twice needs an ESC row — Round 14, Rule 36)
     7 self_review check    (six questions, evidence, ≥ 1 ❌ or verified ✅)
     8 req_coverage         (ledger/closure; --strict-done --coverage-min 85)   — only if a req-ledger block exists
 
@@ -36,12 +38,14 @@ def steps(turn: str, source: str | None, live: bool):
     hum = ["--human", source] if source else []
     src = ["--source", source] if source else []
     s = [
+        ("state_gate", [PY, str(GOV / "state_gate.py"), "check", turn]),
         ("intent_gate", [PY, str(GOV / "intent_gate.py"), "verify", turn, *hum]),
         ("attest", [PY, str(GOV / "attest.py"), "verify", turn, *(["--live"] if live else [])]),
         ("claim_check", [PY, str(GOV / "claim_check.py"), turn]),
         ("read_proof", [PY, str(GOV / "read_proof.py"), "check", turn]),
         ("edit_proof", [PY, str(GOV / "edit_proof.py"), "check", turn]),
         ("mistakes", [PY, str(GOV / "mistakes.py"), "check", turn]),
+        ("recurrence", [PY, str(GOV / "mistakes.py"), "recurrence"]),
         ("self_review", [PY, str(GOV / "self_review.py"), "check", turn, *hum]),
     ]
     text = pathlib.Path(turn).read_text(encoding="utf-8", errors="replace")
@@ -78,19 +82,24 @@ def self_test() -> int:
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
         rc = run(str(bad), str(human), False, set())
+    ok &= rc == 1 and "stopped at step 1 (state_gate)" in buf.getvalue()
+    # 1b) same turn with state_gate skipped → attest is now the first to refuse
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        rc = run(str(bad), str(human), False, {"state_gate"})
     ok &= rc == 1 and "stopped at step 2 (attest)" in buf.getvalue()
     # 2) --skip removes a step from the plan
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        rc = run(str(bad), str(human), False, {"claim_check", "attest"})
-    ok &= "skipped=attest,claim_check" in buf.getvalue() and "1. intent_gate" in buf.getvalue() and "2. read_proof" in buf.getvalue()
-    # 3) a turn with a fabricated (unattested) block → stops at attest (step 2)
+        rc = run(str(bad), str(human), False, {"claim_check", "attest", "state_gate"})
+    ok &= "skipped=attest,claim_check,state_gate" in buf.getvalue() and "1. intent_gate" in buf.getvalue() and "2. read_proof" in buf.getvalue()
+    # 3) a turn with a fabricated (unattested) block → stops at attest (step 2) once state_gate is skipped
     forged = d / "forged.md"; forged.write_text("```text\nremote_proof o@m: 1 path(s)\n✅ remote_proof: all paths match remote\n```\nAll pushed.\n", encoding="utf-8")
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        rc = run(str(forged), str(human), False, set())
+        rc = run(str(forged), str(human), False, {"state_gate"})
     ok &= rc == 1 and "2. attest" in buf.getvalue() and "stopped at step 2" in buf.getvalue()
-    print("✅ precheck self-test ok (no-block turn stops at attest / --skip honoured / forged block stops at attest)" if ok
+    print("✅ precheck self-test ok (no-state turn stops at state_gate / --skip honoured / forged block stops at attest)" if ok
           else "⛔ precheck self-test FAILED")
     return 0 if ok else 1
 

@@ -61,13 +61,18 @@ TOOLS = {  # header regex → (tool, allowed line regexes)
         r"^🔴 .*$", r"^(⛔|✅|ℹ️ ) ?read_proof: .*$",
     ],
     "mistakes": [  # Round 13 (R85, Rule 30)
-        r"^mistakes (record: round=\S+ rule=\S+ rows=\d+|\S+: \d+ admission\(s\), \d+ recorded, ledger rows=\d+)$",
+        r"^mistakes (record: round=\S+ rule=\S+ rows=\d+|\S+: \d+ admission\(s\), \d+ recorded, ledger rows=\d+|recurrence: \d+ row\(s\), \d+ rule\(s\) repeated, \d+ unescalated)$",
         r"^  \| .* \|$", r"^🔴 unrecorded admission: .*$", r"^(⛔|✅|ℹ️ ) ?mistakes: .*$",
+    ],
+    "mock_scan": [  # Round 14 (R93, Rule 37)
+        r"^mock_scan (staged|paths): \d+ file\(s\), \d+ finding\(s\)$", r"^🔴 \S+:\d+ P[1-6] .*$", r"^(⛔|✅) mock_scan: .*$",
     ],
     "edit_proof": [  # Round 13 (R86, Rule 31)
         r"^edit_proof \S+: (MODIFIED|STAGED|COMMITTED-IN-HEAD|UNTRACKED|UNCHANGED) sha256=[0-9a-f]{12}$",
         r"^edit_proof \S+: \d+ edit claim\(s\), \d+ proof block\(s\)$",
         r"^  (\+\d+ -\d+  \(vs HEAD\)|committed [0-9a-f]{7} .*|head=[0-9a-f]{7})$", r"^🔴 .*$", r"^(⛔|✅|ℹ️ ) ?edit_proof: .*$",
+        r"^  scope \d+-\d+: (\d+ hunk\(s\)|file not in HEAD — scope cannot apply)$",  # Round 14 (R92, Rule 37)
+        r"^  @@ -\d+,\d+ \+\d+,\d+ @@ (in-scope|OUT-OF-SCOPE)$",
     ],
     "self_review": [  # Round 13 (R87, Rule 32)
         r"^self_review \S+: \d+ tool block\(s\) in turn$", r"^🔴 S[1-7]: .*$", r"^(⛔|✅) self_review: .*$",
@@ -75,6 +80,10 @@ TOOLS = {  # header regex → (tool, allowed line regexes)
     "precheck": [  # Round 13 (R88, Rule 34)
         r"^precheck \S+: \d+ step\(s\), source=\S+, live=(yes|no)(, skipped=\S+)?$",
         r"^  \d+\. [a-z_]+\s+exit=-?\d+  .*$", r"^(⛔|✅) precheck: .*$",
+    ],
+    "state_gate": [  # Round 14 (R90, Rule 35)
+        r"^state_gate (open|close|verify|check \S+): .*$", r"^  (tag|next|progress)=.*$", r"^🔴 .*$",
+        r"^(⛔|✅|🟡) state_gate: .*$",
     ],
     "attest": [r"^.*$"],
 }
