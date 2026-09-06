@@ -49,3 +49,4 @@
 | workflow_planning_v2_clean_sync | workflow_planning_v2_relative_paths | `.agents/workflows/00-planning.md` | 146 | `670783cb7976086e03f0d8495930813337363cace8b10e9b20ff5fc9231ef0e8` | 2026-09-05 | Relative Paths & Clean Sync | **Active Sealed** |
 | workflow_speckit_v2_clean_sync | workflow_speckit_v2 | `.agents/workflows/00-speckit.md` | 114 | `0a02d98c063ed2ae0197947b8996ed14fba39f3bda042c2001e48929c30c6b29` | 2026-09-05 | Clean Sync Harmonization | **Active Sealed** |
 | readme_v2_relative_clean_sync | readme_v2_orchestration_clean | `README.md` | 137 | `2fc7fabc088e0e484501c66a158291baa96f0889d1fb65e5bf3a933b34186fcf` | 2026-09-05 | Relative Links & Clean Sync Protocol | **Active Sealed** |
+| agent_hard_rules_r8 | — | `.governance/AGENT_HARD_RULES.md` | 173 | `dd726515bfc8cc220ff6a026ab9d95491bd24089588a309e7b1dacedf933a958` | 2026-09-06 | Governance Hard Rules v2.8 (Rules 1-17) | **Active Sealed** |

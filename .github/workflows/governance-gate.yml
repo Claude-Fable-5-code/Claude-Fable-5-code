@@ -67,7 +67,7 @@ jobs:
           git clone -q . /tmp/clone && cd /tmp/clone
           git remote set-url origin /tmp/bare.git
           git config core.hooksPath .governance/hooks
-          if git push origin HEAD:main >/tmp/o1 2>&1; then echo "hook allowed push to main"; cat /tmp/o1; exit 1; fi
+          if git push origin HEAD:refs/heads/main >/tmp/o1 2>&1; then echo "hook allowed push to main"; cat /tmp/o1; exit 1; fi
           grep -q "Rule 7" /tmp/o1
           if git -c 'credential.helper=!echo x' push origin HEAD:refs/heads/f1 >/tmp/o2 2>&1; then echo "hook allowed inline credential helper"; exit 1; fi  # secret-scan:allow (negative test)
           grep -q "Rule 8" /tmp/o2
