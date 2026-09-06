@@ -81,7 +81,7 @@ def scan_lines(lines):
 
 
 def staged_files():
-    r = subprocess.run(["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"], capture_output=True, text=True, cwd=ROOT)
+    r = subprocess.run(["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"], capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
     return [p for p in r.stdout.split("\n") if p]
 
 

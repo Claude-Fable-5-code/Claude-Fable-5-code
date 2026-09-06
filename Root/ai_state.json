@@ -1,10 +1,10 @@
 {
   "mode": "[ACT]",
-  "current_tag": "[ROUND14-PARITY-FIX]",
-  "turn_count": 308,
-  "git_commit": "3e1fc30",
-  "last_action": "Sync proposed_files/.gitignore parity with root .gitignore to satisfy parity gate (verify_sync.py)",
-  "next_action": "Open PR #14 and await CI + 300s timing guard",
+  "current_tag": "[ROUND15-C2]",
+  "turn_count": 313,
+  "git_commit": "00d8579",
+  "last_action": "C2: .gitattributes eol=lf; CRLF removed from Root/ai_state.json + Root/ANCHORS.md; encoding=utf-8 errors=replace in attest.py head()/run and mock_scan.staged_files()",
+  "next_action": "C3 ledger rows (Rule 16 + Rule 10 repeats, owner-side agent) + Rule 38 + ROUND15_REVIEW --full + HANDOFF_ROUND15",
   "last_message_summary": "استلام تقرير وحزمة Round 10 من الاستشاري، شرح اكتشافات الجولة 10 (الكتل المصطنعة وحلها بـ attest)، وتثبيت المرساة r10 بنجاح.",
-  "last_updated": "2026-09-06T19:14:00Z"
+  "last_updated": "2026-09-06T20:06:28Z"
 }

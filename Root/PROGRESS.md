@@ -30,3 +30,14 @@
 - C6b Rules 35-37 + protocol steps 0d/2e/2f + 7 skills + plan ticks — commit f4a6361 — https://www.genspark.ai/api/files/s/SqJJGyeF
 - C6c ROUND14_REVIEW.md (--full 555/555) + HANDOFF_ROUND14.md — 124dc83 — https://www.genspark.ai/api/files/s/8q8Vr7DK
 - C7 squash → 3e839a1 — https://www.genspark.ai/api/files/s/mc7zSGK9 (reset #3 recovered from this bundle) ; final URL‑row commit — see HANDOFF_ROUND14.md
+
+## Round 15 — CI preflight after PR #14 (2026-09-06)
+- C0 fixture + PLAN_ROUND15 + ROUND15_PREFLIGHT_AUDIT + this section — d07f744 — https://www.genspark.ai/api/files/s/c3KAZse8
+- C1 state_gate merge-aware verify (14/14 self-test; passes on 00d8579) + remaining=N + LF writes — 92bf25b — https://www.genspark.ai/api/files/s/YTs1knCS
+- C2 .gitattributes (eol=lf) + renormalized ai_state.json/ANCHORS.md + utf-8 in attest.py (2) / mock_scan.py (1) — _this commit_
+
+## Remaining
+- [x] C3 ledger rows + Rule 38 + ROUND15_REVIEW + HANDOFF_ROUND15 (rebuilt after reset #5)
+- [x] C4 squash + final URL row (C3 archive 7EHRckT8)
+- [ ] OWNER: apply final archive, push -f, open PR, ci_status.py --pr N all green, wait ≥300 s, manual merge
+- [ ] OWNER: import .github/rulesets/main-protection.json (API /rulesets is still [])
